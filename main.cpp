@@ -6,6 +6,7 @@
 #include <iterator>
 #include <map>
 #include <cstdio>
+#include <cstdint>
 
 #define RULE_T_NAME "T_NAME"
 #define RULE_T_NUMBER "T_NUMBER"
@@ -250,6 +251,12 @@ private:
     bool is_semicolon(char ch) { return ch == ';'; }
 };
 
+struct SuccessWithPos {
+public:
+    bool is_success;
+    uint8_t pos;
+};
+
 class AstBuilder {
 public:
     Grammar *grammar;
@@ -259,20 +266,23 @@ public:
 
     bool build() {
         vec_iter_t it = tokenizer->tokens.begin();
-        return try_grammar_line(&(grammar->lines["PROG"]), &it);
+        SuccessWithPos success_with_pos = try_grammar_line(&(grammar->lines["PROG"]), &it);
+        return success_with_pos.is_success;
     };
 
 private:
-    bool try_grammar_line(GrammarLine *gr_line, vec_iter_t *token_it) {
+    SuccessWithPos try_grammar_line(GrammarLine *gr_line, vec_iter_t *token_it) {
         vec_iter_t *orig_token_it = token_it;
 
+        uint8_t idx = 0;
         for (auto rule : gr_line->rules) {
             if (try_grammar_rule(&rule, orig_token_it)) {
-                return true;
+                return {true, idx};
             }
+            idx++;
         }
 
-        return false;
+        return {false, 0};
     };
 
     bool try_grammar_rule(GrammarRule *rule, vec_iter_t *token_it) {
@@ -287,7 +297,8 @@ private:
                     return false;
                 }
             } else {
-                if (!try_grammar_line(&grammar->lines[rule_part], token_it)) {
+                SuccessWithPos line_success_with_pos = try_grammar_line(&grammar->lines[rule_part], token_it);
+                if (!line_success_with_pos.is_success) {
                     token_it = orig_token_it;
                     return false;
                 }
