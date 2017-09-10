@@ -14,6 +14,7 @@
 #define RULE_T_SUB "T_SUB"
 #define RULE_T_MUL "T_MUL"
 #define RULE_T_DIV "T_DIV"
+#define RULE_T_EOP "T_EOP"
 
 using namespace std;
 
@@ -126,6 +127,7 @@ enum TokenType {
     OP_MUL,
     OP_DIV,
     SEMICOLON,
+    EOP,
 };
 
 ostream & operator<<(ostream & os, const TokenType & self) {
@@ -150,6 +152,9 @@ ostream & operator<<(ostream & os, const TokenType & self) {
             break;
         case SEMICOLON:
             os << "SEMICOLON";
+            break;
+        case EOP:
+            os << "EOP";
             break;
     }
     return os;
@@ -182,6 +187,8 @@ public:
 
             tokens.push_back(get_token(&source_if));
         }
+
+        tokens.push_back({TokenType::EOP, ""});
     };
 
     friend ostream & operator<<(ostream & os, const Tokenizer & self) {
@@ -265,6 +272,7 @@ public:
     AstBuilder(Grammar *grammar, Tokenizer *tokenizer) : grammar(grammar), tokenizer(tokenizer) {};
 
     bool build() {
+        cout << "BUILD" << endl;
         vec_iter_t it = tokenizer->tokens.begin();
         SuccessWithPos success_with_pos = try_grammar_line(&(grammar->lines["PROG"]), &it);
         return success_with_pos.is_success;
@@ -272,13 +280,15 @@ public:
 
 private:
     SuccessWithPos try_grammar_line(GrammarLine *gr_line, vec_iter_t *token_it) {
-        vec_iter_t *orig_token_it = token_it;
+        cout << "Try grammar line: " << *gr_line << " on: " << **token_it << endl;
+        auto orig_token_it = *token_it;
 
         uint8_t idx = 0;
         for (auto rule : gr_line->rules) {
-            if (try_grammar_rule(&rule, orig_token_it)) {
+            if (try_grammar_rule(&rule, token_it)) {
                 return {true, idx};
             }
+            *token_it = orig_token_it;
             idx++;
         }
 
@@ -286,20 +296,21 @@ private:
     };
 
     bool try_grammar_rule(GrammarRule *rule, vec_iter_t *token_it) {
-        vec_iter_t *orig_token_it = token_it;
+        cout << "- Try grammar rule: " << *rule << " on: " << **token_it << endl;
+        auto orig_token_it = *token_it;
 
         for (const auto rule_part : rule->parts) {
             if (is_token(rule_part)) {
                 if (is_token_match(rule_part, **token_it)) {
                     (*token_it)++;
                 } else {
-                    token_it = orig_token_it;
+                    *token_it = orig_token_it;
                     return false;
                 }
             } else {
                 SuccessWithPos line_success_with_pos = try_grammar_line(&grammar->lines[rule_part], token_it);
                 if (!line_success_with_pos.is_success) {
-                    token_it = orig_token_it;
+                    *token_it = orig_token_it;
                     return false;
                 }
             }
