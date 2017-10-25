@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <string>
 #include <vector>
 #include <algorithm>
@@ -7,6 +8,7 @@
 #include <map>
 #include <cstdio>
 #include <cstdint>
+#include <utility>
 
 #define RULE_T_NAME "T_NAME"
 #define RULE_T_NUMBER "T_NUMBER"
@@ -26,8 +28,10 @@ using namespace std;
 
 uint8_t indent = 0;
 
-void add_indent() {
-  for (uint8_t i = 0; i < indent; i++) cout << "\e[90m| \e[0m";
+string indent_str() {
+  ostringstream oss;
+  for (uint8_t i = 0; i < indent; i++) oss << "\e[90m| \e[0m";
+  return oss.str();
 }
 
 class Token;
@@ -315,24 +319,20 @@ private:
   bool try_grammar_line(GrammarLine *gr_line, vec_iter_t *token_it) {
     indent++;
 
-    add_indent();
-    cout << "Try line: \e[96m" << *gr_line << "\e[0mon: \e[96m" << **token_it << "\e[0m" << endl;
+    cout << indent_str() << "Try line: \e[96m" << *gr_line << "\e[0mon: \e[96m" << **token_it << "\e[0m" << endl;
     auto orig_token_it = *token_it;
 
     for (auto rule : gr_line->rules) {
       if (try_grammar_rule(&rule, token_it)) {
-        add_indent();
-        cout << "Y" << endl;
+        cout << indent_str() << "Y" << endl;
         indent--;
         return true;
       }
-      add_indent();
-      cout << "Revert  \e[91m" << **token_it << "\e[0m -> \e[91m" << *orig_token_it << "\e[0m" << endl;
+      cout << indent_str() << "Revert  \e[91m" << **token_it << "\e[0m -> \e[91m" << *orig_token_it << "\e[0m" << endl;
       *token_it = orig_token_it;
     }
 
-    add_indent();
-    cout << "N" << endl;
+    cout << indent_str() << "N" << endl;
     indent--;
     return false;
   };
@@ -340,33 +340,28 @@ private:
   bool try_grammar_rule(GrammarRule *rule, vec_iter_t *token_it) {
     indent++;
 
-    add_indent();
-    cout << "Try rule: \e[93m" << *rule << "\e[0m on: \e[93m" << **token_it << "\e[0m" << endl;
+    cout << indent_str() << "Try rule: \e[93m" << *rule << "\e[0m on: \e[93m" << **token_it << "\e[0m" << endl;
 
     for (const auto rule_part : rule->parts) {
       if (is_token(rule_part)) {
         if (is_token_match(rule_part, **token_it)) {
-          add_indent();
-          cout << "MATCH \e[32m" << **token_it << "\e[0m" << endl;
+          cout << indent_str() << "MATCH \e[32m" << **token_it << "\e[0m" << endl;
           (*token_it)++;
         } else {
-          add_indent();
-          cout << "N" << endl;
+          cout << indent_str() << "N" << endl;
           indent--;
           return false;
         }
       } else {
         if (!try_grammar_line(&grammar->lines[rule_part], token_it)) {
-          add_indent();
-          cout << "N" << endl;
+          cout << indent_str() << "N" << endl;
           indent--;
           return false;
         }
       }
     }
 
-    add_indent();
-    cout << "Y" << endl;
+    cout << indent_str() << "Y" << endl;
     indent--;
     return true;
   }
