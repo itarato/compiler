@@ -1,2 +1,4 @@
-puts 10 + 2 - 5;
-puts 1;
+if 1 < 2 {
+  puts 10;
+}
+puts 2 + 3;
