@@ -46,14 +46,11 @@ public:
   void add_part(string part) { parts.push_back(part); };
 
   friend ostream & operator<<(ostream & os, const GrammarRule & self) {
-    if (self.is_one_or_more) os << "+";
     os << "{ ";
     copy(self.parts.begin(), self.parts.end(), ostream_iterator<string>(os, " "));
     os << "}";
     return os;
   };
-
-  void set_one_or_more() { is_one_or_more = true; }
 };
 
 class GrammarLine {
@@ -102,11 +99,7 @@ public:
         grammar_line->add_rule(*grammar_rule);
         grammar_rule = new GrammarRule();
       } else {
-        if (word == "+") {
-          grammar_rule->set_one_or_more();
-        } else {
-          grammar_rule->add_part(word);
-        }
+        grammar_rule->add_part(word);
       }
     }
     grammar_line->add_rule(*grammar_rule);
