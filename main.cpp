@@ -308,36 +308,33 @@ public:
   bool build() {
     cout << "BUILD" << endl;
     vec_iter_t it = tokenizer->tokens.begin();
-    SuccessWithPos success_with_pos = try_grammar_line(&(grammar->lines["PROG"]), &it);
-    return success_with_pos.is_success;
+    return try_grammar_line(&(grammar->lines["PROG"]), &it);
   };
 
 private:
-  SuccessWithPos try_grammar_line(GrammarLine *gr_line, vec_iter_t *token_it) {
+  bool try_grammar_line(GrammarLine *gr_line, vec_iter_t *token_it) {
     indent++;
 
     add_indent();
     cout << "Try line: \e[96m" << *gr_line << "\e[0mon: \e[96m" << **token_it << "\e[0m" << endl;
     auto orig_token_it = *token_it;
 
-    uint8_t idx = 0;
     for (auto rule : gr_line->rules) {
       if (try_grammar_rule(&rule, token_it)) {
         add_indent();
         cout << "Y" << endl;
         indent--;
-        return {true, idx};
+        return true;
       }
       add_indent();
       cout << "Revert  \e[91m" << **token_it << "\e[0m -> \e[91m" << *orig_token_it << "\e[0m" << endl;
       *token_it = orig_token_it;
-      idx++;
     }
 
     add_indent();
     cout << "N" << endl;
     indent--;
-    return {false, 0};
+    return false;
   };
 
   bool try_grammar_rule(GrammarRule *rule, vec_iter_t *token_it) {
@@ -359,8 +356,7 @@ private:
           return false;
         }
       } else {
-        SuccessWithPos line_success_with_pos = try_grammar_line(&grammar->lines[rule_part], token_it);
-        if (!line_success_with_pos.is_success) {
+        if (!try_grammar_line(&grammar->lines[rule_part], token_it)) {
           add_indent();
           cout << "N" << endl;
           indent--;
