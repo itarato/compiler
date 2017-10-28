@@ -21,7 +21,6 @@ string indent_str() {
 
 typedef vector<Token>::iterator vec_iter_t;
 
-
 AstBuilder::AstBuilder(Grammar *grammar, Tokenizer *tokenizer) : grammar(grammar), tokenizer(tokenizer) {};
 
 bool AstBuilder::build() {

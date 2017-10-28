@@ -11,7 +11,7 @@ Tokenizer::Tokenizer() {
   ifstream source_if("sample.p");
 
   for (;;) {
-    for (char top_ch = source_if.peek(); is_whitespace(source_if.peek()); source_if.get()) {}
+    for (; is_whitespace(source_if.peek()); source_if.get()) {}
 
     if (source_if.peek() == EOF) break;
 
