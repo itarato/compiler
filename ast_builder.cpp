@@ -8,6 +8,8 @@
 #include "grammar.h"
 #include "grammar_rule.h"
 #include "grammar_line.h"
+#include "ast_node.h"
+#include "ast_node_part.h"
 
 using namespace std;
 
@@ -55,24 +57,37 @@ bool AstBuilder::try_grammar_rule(GrammarRule *rule, vec_iter_t *token_it) {
 
   cout << indent_str() << "Try rule: \e[93m" << *rule << "\e[0m on: \e[93m" << **token_it << "\e[0m" << endl;
 
+  // Make new AstNode
+  // AstNode
+
   for (const auto rule_part : rule->parts) {
     if (is_token(rule_part)) {
       if (is_token_match(rule_part, **token_it)) {
         cout << indent_str() << "MATCH \e[32m" << **token_it << "\e[0m" << endl;
         (*token_it)++;
+
+        // Push AstNodePart-Token to AstNode
       } else {
+        // Abort
+
         cout << indent_str() << "N" << endl;
         indent--;
         return false;
       }
     } else {
       if (!try_grammar_line(&grammar->lines[rule_part], token_it)) {
+        // Abort
+
         cout << indent_str() << "N" << endl;
         indent--;
         return false;
       }
+
+      // Push response
     }
   }
+
+  // register the AstNode
 
   cout << indent_str() << "Y" << endl;
   indent--;
