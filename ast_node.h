@@ -3,7 +3,6 @@
 #include <vector>
 #include <string>
 
-#include "token.h"
 #include "ast_node_part.h"
 
 using namespace std;

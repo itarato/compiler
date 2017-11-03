@@ -1,14 +1,13 @@
 #pragma once
 
-#include <utility>
-
 #include "token.h"
 
 class AstNode;
 
 using namespace std;
 
-struct AstNodePart {
+class AstNodePart {
+public:
   union {
     AstNode *p_node;
     Token token;
@@ -17,6 +16,9 @@ struct AstNodePart {
 
   AstNodePart(bool);
   ~AstNodePart();
+
+  AstNodePart(AstNodePart &&) = default;
+  AstNodePart(const AstNodePart &) = delete;
 };
 AstNodePart&& new_ast_node_part_node(AstNode *);
 AstNodePart&& new_ast_node_part_token(Token);

@@ -1,6 +1,7 @@
 #include <vector>
 #include <iostream>
 #include <sstream>
+#include <utility>
 
 #include "ast_builder.h"
 #include "token.h"
@@ -8,8 +9,8 @@
 #include "grammar.h"
 #include "grammar_rule.h"
 #include "grammar_line.h"
-#include "ast_node.h"
 #include "ast_node_part.h"
+#include "ast_node.h"
 
 using namespace std;
 
@@ -17,7 +18,7 @@ uint8_t indent = 0;
 
 string indent_str() {
   ostringstream oss;
-  for (uint8_t i = 0; i < indent; i++) oss << "\e[90m| \e[0m";
+  for (uint8_t i = 0; i < indent; i++) oss << "\x1B[90m| \x1B[0m";
   return oss.str();
 }
 
@@ -34,7 +35,7 @@ bool AstBuilder::build() {
 bool AstBuilder::try_grammar_line(GrammarLine *gr_line, vec_iter_t *token_it) {
   indent++;
 
-  cout << indent_str() << "Try line: \e[96m" << *gr_line << "\e[0mon: \e[96m" << **token_it << "\e[0m" << endl;
+  cout << indent_str() << "Try line: \x1B[96m" << *gr_line << "\x1B[0mon: \x1B[96m" << **token_it << "\x1B[0m" << endl;
   auto orig_token_it = *token_it;
 
   for (auto rule : gr_line->rules) {
@@ -43,7 +44,7 @@ bool AstBuilder::try_grammar_line(GrammarLine *gr_line, vec_iter_t *token_it) {
       indent--;
       return true;
     }
-    cout << indent_str() << "Revert  \e[91m" << **token_it << "\e[0m -> \e[91m" << *orig_token_it << "\e[0m" << endl;
+    cout << indent_str() << "Revert  \x1B[91m" << **token_it << "\x1B[0m -> \x1B[91m" << *orig_token_it << "\x1B[0m" << endl;
     *token_it = orig_token_it;
   }
 
@@ -55,18 +56,21 @@ bool AstBuilder::try_grammar_line(GrammarLine *gr_line, vec_iter_t *token_it) {
 bool AstBuilder::try_grammar_rule(GrammarRule *rule, vec_iter_t *token_it) {
   indent++;
 
-  cout << indent_str() << "Try rule: \e[93m" << *rule << "\e[0m on: \e[93m" << **token_it << "\e[0m" << endl;
+  cout << indent_str() << "Try rule: \x1B[93m" << *rule << "\x1B[0m on: \x1B[93m" << **token_it << "\x1B[0m" << endl;
 
   // Make new AstNode
-  // AstNode
+  // AstNode ast_node("rule-later");
+  // ast_node.parts.push_back(new_ast_node_part_token(Token(TokenType::NUMBER, "value")));
 
   for (const auto rule_part : rule->parts) {
     if (is_token(rule_part)) {
       if (is_token_match(rule_part, **token_it)) {
-        cout << indent_str() << "MATCH \e[32m" << **token_it << "\e[0m" << endl;
+        cout << indent_str() << "MATCH \x1B[32m" << **token_it << "\x1B[0m" << endl;
         (*token_it)++;
 
         // Push AstNodePart-Token to AstNode
+        // ast_node.parts.push_back(new_ast_node_part_token(**token_it));
+        // ast_node.parts.push_back(AstNodePart(false));
       } else {
         // Abort
 
