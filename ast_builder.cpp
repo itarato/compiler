@@ -32,17 +32,18 @@ bool AstBuilder::build() {
   return try_grammar_line(&(grammar->lines["PROG"]), &it);
 };
 
-bool AstBuilder::try_grammar_line(GrammarLine *gr_line, vec_iter_t *token_it) {
+AstNode * AstBuilder::try_grammar_line(GrammarLine *gr_line, vec_iter_t *token_it) {
   indent++;
 
   cout << indent_str() << "Try line: \x1B[96m" << *gr_line << "\x1B[0mon: \x1B[96m" << **token_it << "\x1B[0m" << endl;
   auto orig_token_it = *token_it;
 
   for (auto rule : gr_line->rules) {
-    if (try_grammar_rule(&rule, token_it)) {
+    AstNode *p_ast_node = try_grammar_rule(&rule, token_it);
+    if (p_ast_node != nullptr) {
       cout << indent_str() << "Y" << endl;
       indent--;
-      return true;
+      return p_ast_node;
     }
     cout << indent_str() << "Revert  \x1B[91m" << **token_it << "\x1B[0m -> \x1B[91m" << *orig_token_it << "\x1B[0m" << endl;
     *token_it = orig_token_it;
@@ -50,44 +51,49 @@ bool AstBuilder::try_grammar_line(GrammarLine *gr_line, vec_iter_t *token_it) {
 
   cout << indent_str() << "N" << endl;
   indent--;
-  return false;
+  return nullptr;
 };
 
-bool AstBuilder::try_grammar_rule(GrammarRule *rule, vec_iter_t *token_it) {
+AstNode * AstBuilder::try_grammar_rule(GrammarRule *rule, vec_iter_t *token_it) {
   indent++;
 
   cout << indent_str() << "Try rule: \x1B[93m" << *rule << "\x1B[0m on: \x1B[93m" << **token_it << "\x1B[0m" << endl;
 
   // Make new AstNode
-  // AstNode ast_node("rule-later");
-  // ast_node.parts.push_back(new_ast_node_part_token(Token(TokenType::NUMBER, "value")));
+  AstNode *p_ast_node = new AstNode("rule-later");
 
   for (const auto rule_part : rule->parts) {
     if (is_token(rule_part)) {
       if (is_token_match(rule_part, **token_it)) {
         cout << indent_str() << "MATCH \x1B[32m" << **token_it << "\x1B[0m" << endl;
-        (*token_it)++;
 
         // Push AstNodePart-Token to AstNode
-        // ast_node.parts.push_back(new_ast_node_part_token(**token_it));
-        // ast_node.parts.push_back(AstNodePart(false));
+        p_ast_node->parts.push_back(new_ast_node_part_token(**token_it));
+
+        (*token_it)++;
       } else {
         // Abort
 
-        cout << indent_str() << "N" << endl;
-        indent--;
-        return false;
-      }
-    } else {
-      if (!try_grammar_line(&grammar->lines[rule_part], token_it)) {
-        // Abort
+        delete p_ast_node;
 
         cout << indent_str() << "N" << endl;
         indent--;
-        return false;
+        return nullptr;
+      }
+    } else {
+      AstNode * p_part_ast_node = try_grammar_line(&grammar->lines[rule_part], token_it);
+      if (p_part_ast_node == nullptr) {
+        // Abort
+
+        delete p_ast_node;
+
+        cout << indent_str() << "N" << endl;
+        indent--;
+        return nullptr;
       }
 
       // Push response
+      p_ast_node->parts.push_back(new_ast_node_part_node(p_part_ast_node));
     }
   }
 
@@ -95,7 +101,7 @@ bool AstBuilder::try_grammar_rule(GrammarRule *rule, vec_iter_t *token_it) {
 
   cout << indent_str() << "Y" << endl;
   indent--;
-  return true;
+  return p_ast_node;
 }
 
 bool AstBuilder::is_token(string rule_part) {

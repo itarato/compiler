@@ -10,7 +10,8 @@ using namespace std;
 class AstNode {
 public:
   string rule;
-  vector<AstNodePart> parts;
+  vector<AstNodePart *> parts;
 
   AstNode(string);
+  ~AstNode();
 };

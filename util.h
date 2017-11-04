@@ -41,6 +41,8 @@ enum TokenType {
   BRACE_CLOSE,
 
   EOP,
+
+  INVALID,
 };
 
 ostream & operator<<(ostream &, const TokenType &);

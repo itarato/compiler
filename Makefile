@@ -1,4 +1,4 @@
-CXXFLAGS= -std=c++14 -Wall -pedantic
+CXXFLAGS=-g -std=c++14 -Wall -pedantic
 BIN=main
 
 SRC=$(wildcard *.cpp)

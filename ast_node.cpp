@@ -4,4 +4,10 @@
 
 using namespace std;
 
-AstNode::AstNode(string rule) : rule(rule) {};
+AstNode::AstNode(string rule) : rule(rule) {}
+
+AstNode::~AstNode() {
+  for (auto part : parts) {
+    delete part;
+  }
+}

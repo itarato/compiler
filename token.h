@@ -12,6 +12,7 @@ public:
   TokenType type;
   string value;
 
+  Token();
   Token(TokenType, string);
 
   friend ostream & operator<<(ostream & os, const Token & self) {
