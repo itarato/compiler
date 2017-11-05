@@ -20,9 +20,9 @@ public:
 
   friend ostream & operator<<(ostream & os, const AstNodePart & self) {
     if (self.is_node) {
-      os << *self.p_node << endl;
+      os << *self.p_node;
     } else {
-      os << self.token << endl;
+      os << "\"" << self.token << "\"";
     }
 
     return os;

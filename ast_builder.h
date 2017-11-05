@@ -24,8 +24,8 @@ public:
   AstNode * build();
 
 private:
-  AstNode * try_grammar_line(GrammarLine *, vec_iter_t *);
-  AstNode * try_grammar_rule(GrammarRule *, vec_iter_t *);
+  AstNode * try_grammar_line(GrammarLine *, vec_iter_t *, string);
+  AstNode * try_grammar_rule(GrammarRule *, vec_iter_t *, string);
   bool is_token(string);
   bool is_token_match(string, Token);
 };

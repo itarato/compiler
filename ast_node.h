@@ -17,15 +17,15 @@ public:
   ~AstNode();
 
   friend ostream & operator<<(ostream & os, const AstNode & self) {
-    os << "{" << endl;
-    os << self.rule << ": [" << endl;
+    os << "{\"" << self.rule << "\":[";
 
-    for (auto & part : self.parts) {
-      os << *part << "," << endl;
+    for (auto it = self.parts.begin(); it != self.parts.end(); it++) {
+      os << **it;
+      if ((it + 1) != self.parts.end()) os << ",";
     }
 
     os << "]";
-    os << "}" << endl;
+    os << "}";
 
     return os;
   };

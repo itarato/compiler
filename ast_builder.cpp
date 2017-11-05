@@ -29,23 +29,23 @@ AstBuilder::AstBuilder(Grammar *grammar, Tokenizer *tokenizer) : grammar(grammar
 AstNode * AstBuilder::build() {
   cout << "BUILD" << endl;
   vec_iter_t it = tokenizer->tokens.begin();
-  return try_grammar_line(&(grammar->lines["PROG"]), &it);
+  return try_grammar_line(&(grammar->lines["PROG"]), &it, "PROG");
 };
 
-AstNode * AstBuilder::try_grammar_line(GrammarLine *gr_line, vec_iter_t *token_it) {
+AstNode * AstBuilder::try_grammar_line(GrammarLine *gr_line, vec_iter_t *token_it, string rule_name) {
   indent++;
 
   cout << indent_str() << "Try line: \x1B[96m" << *gr_line << "\x1B[0mon: \x1B[96m" << **token_it << "\x1B[0m" << endl;
   auto orig_token_it = *token_it;
 
   for (auto rule : gr_line->rules) {
-    AstNode *p_ast_node = try_grammar_rule(&rule, token_it);
+    AstNode *p_ast_node = try_grammar_rule(&rule, token_it, rule_name);
     if (p_ast_node != nullptr) {
       cout << indent_str() << "Y" << endl;
       indent--;
       return p_ast_node;
     }
-    cout << indent_str() << "Revert  \x1B[91m" << **token_it << "\x1B[0m -> \x1B[91m" << *orig_token_it << "\x1B[0m" << endl;
+    cout << indent_str() << "Revert \x1B[91m" << **token_it << "\x1B[0m -> \x1B[91m" << *orig_token_it << "\x1B[0m" << endl;
     *token_it = orig_token_it;
   }
 
@@ -54,13 +54,13 @@ AstNode * AstBuilder::try_grammar_line(GrammarLine *gr_line, vec_iter_t *token_i
   return nullptr;
 };
 
-AstNode * AstBuilder::try_grammar_rule(GrammarRule *rule, vec_iter_t *token_it) {
+AstNode * AstBuilder::try_grammar_rule(GrammarRule *rule, vec_iter_t *token_it, string rule_name) {
   indent++;
 
   cout << indent_str() << "Try rule: \x1B[93m" << *rule << "\x1B[0m on: \x1B[93m" << **token_it << "\x1B[0m" << endl;
 
   // Make new AstNode
-  AstNode *p_ast_node = new AstNode("rule-later");
+  AstNode *p_ast_node = new AstNode(rule_name);
 
   for (const auto rule_part : rule->parts) {
     if (is_token(rule_part)) {
@@ -81,7 +81,7 @@ AstNode * AstBuilder::try_grammar_rule(GrammarRule *rule, vec_iter_t *token_it) 
         return nullptr;
       }
     } else {
-      AstNode * p_part_ast_node = try_grammar_line(&grammar->lines[rule_part], token_it);
+      AstNode * p_part_ast_node = try_grammar_line(&grammar->lines[rule_part], token_it, rule_part);
       if (p_part_ast_node == nullptr) {
         // Abort
 
