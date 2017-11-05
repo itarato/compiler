@@ -18,5 +18,5 @@ public:
   friend ostream & operator<<(ostream & os, const Token & self) {
     os << self.type << "(" << self.value << ")";
     return os;
-  }
+  };
 };

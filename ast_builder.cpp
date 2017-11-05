@@ -26,7 +26,7 @@ typedef vector<Token>::iterator vec_iter_t;
 
 AstBuilder::AstBuilder(Grammar *grammar, Tokenizer *tokenizer) : grammar(grammar), tokenizer(tokenizer) {};
 
-bool AstBuilder::build() {
+AstNode * AstBuilder::build() {
   cout << "BUILD" << endl;
   vec_iter_t it = tokenizer->tokens.begin();
   return try_grammar_line(&(grammar->lines["PROG"]), &it);

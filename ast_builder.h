@@ -21,7 +21,7 @@ public:
   Tokenizer *tokenizer;
 
   AstBuilder(Grammar *, Tokenizer *);
-  bool build();
+  AstNode * build();
 
 private:
   AstNode * try_grammar_line(GrammarLine *, vec_iter_t *);

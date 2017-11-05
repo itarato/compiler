@@ -3,6 +3,7 @@
 #include "grammar.h"
 #include "tokenizer.h"
 #include "ast_builder.h"
+#include "ast_node.h"
 
 using namespace std;
 
@@ -14,7 +15,10 @@ int main() {
   cout << t << endl;
 
   AstBuilder ab(&g, &t);
-  ab.build();
+  AstNode * p_ast_node = ab.build();
+
+  if (p_ast_node != nullptr)
+    cout << *p_ast_node << endl;
 
   exit(EXIT_SUCCESS);
 }
