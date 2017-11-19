@@ -11,7 +11,7 @@ class Tokenizer {
 public:
   vector<Token> tokens;
 
-  Tokenizer();
+  Tokenizer(char *);
 
   friend ostream & operator<<(ostream & os, const Tokenizer & self) {
     os << "T[ ";

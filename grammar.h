@@ -12,7 +12,7 @@ class Grammar {
 public:
   map<string, GrammarLine> lines;
 
-  Grammar();
+  Grammar(char *);
 
   bool is_line_def(string);
   bool is_rule_divider(string);

@@ -8,8 +8,8 @@
 #include "grammar_line.h"
 #include "grammar_rule.h"
 
-Grammar::Grammar() {
-  ifstream grammar_ifs("grammar");
+Grammar::Grammar(char *grammar_file_name) {
+  ifstream grammar_ifs(grammar_file_name);
 
   GrammarLine *grammar_line = nullptr;
   GrammarRule *grammar_rule = nullptr;

@@ -7,8 +7,8 @@
 
 using namespace std;
 
-Tokenizer::Tokenizer() {
-  ifstream source_if("sample.p");
+Tokenizer::Tokenizer(char *source_file_name) {
+  ifstream source_if(source_file_name);
 
   for (;;) {
     for (; is_whitespace(source_if.peek()); source_if.get()) {}
