@@ -24,8 +24,7 @@ public:
       if ((it + 1) != self.parts.end()) os << ",";
     }
 
-    os << "]";
-    os << "}";
+    os << "]}";
 
     return os;
   };
