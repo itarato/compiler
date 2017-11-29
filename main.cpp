@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cstring>
 
 #include "grammar.h"
 #include "tokenizer.h"
@@ -7,20 +8,38 @@
 
 using namespace std;
 
+int mode_parse(int, char *[]);
+int mode_grammar_translate(int, char *[]);
+void print_help();
+
 // Receives:
 //  - grammar file name
 //  - source file name
 int main(int argc, char *argv[]) {
-  if (argc != 3) {
-    cout << "Invocation error 2 parameters are needed, found " << argc - 1 << "." << endl;
-    cout << "Usage: ./main GRAMMAR SOURCE\n";
-    exit(EXIT_FAILURE);
+  if (argc <= 1) {
+      print_help();
+      exit(EXIT_FAILURE);
   }
 
-  Grammar g(argv[1]);
+  if (strcmp(argv[1], "parse") == 0) {
+    exit(mode_parse(argc, argv));
+  } else if (strcmp(argv[1], "grammar") == 0) {
+    exit(mode_grammar_translate(argc, argv));
+  }
+
+  exit(EXIT_FAILURE);
+}
+
+int mode_parse(int argc, char *argv[]) {
+  if (argc != 4) {
+    print_help();
+    return EXIT_FAILURE;
+  }
+
+  Grammar g(argv[2]);
   cout << g << endl;
 
-  Tokenizer t(argv[2]);
+  Tokenizer t(argv[3]);
   cout << t << endl;
 
   AstBuilder ab(&g, &t);
@@ -29,5 +48,20 @@ int main(int argc, char *argv[]) {
   if (p_ast_node != nullptr)
     cout << *p_ast_node << endl;
 
-  exit(EXIT_SUCCESS);
+  return EXIT_SUCCESS;
+}
+
+int mode_grammar_translate(int argc, char *argv[]) {
+  if (argc != 3) {
+    print_help();
+    return EXIT_FAILURE;
+  }
+
+  return EXIT_SUCCESS;
+}
+
+void print_help() {
+  cout << "Invocation error.\n";
+  cout << "Usage for parsing: ./main parse GRAMMAR SOURCE\n";
+  cout << "Usage for grammar correction: ./main grammar GRAMMAR\n";
 }
