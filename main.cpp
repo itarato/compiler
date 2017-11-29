@@ -57,6 +57,9 @@ int mode_grammar_translate(int argc, char *argv[]) {
     return EXIT_FAILURE;
   }
 
+  Grammar g(argv[2]);
+  cout << g << endl;
+
   return EXIT_SUCCESS;
 }
 
