@@ -5,6 +5,7 @@
 #include "tokenizer.h"
 #include "ast_builder.h"
 #include "ast_node.h"
+#include "grammar_normalizer.h"
 
 using namespace std;
 
@@ -59,6 +60,9 @@ int mode_grammar_translate(int argc, char *argv[]) {
 
   Grammar g(argv[2]);
   cout << g << endl;
+
+  GrammarNormalizer gn(&g);
+  gn.normalize();
 
   return EXIT_SUCCESS;
 }
