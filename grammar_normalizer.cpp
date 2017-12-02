@@ -13,6 +13,11 @@ using namespace std;
 GrammarNormalizer::GrammarNormalizer(Grammar *g) : grammar(g) {}
 
 void GrammarNormalizer::normalize() {
+  eliminate_left_recursive();
+  eliminate_premature_match();
+}
+
+void GrammarNormalizer::eliminate_left_recursive() {
   string left_rec_tag = get_left_recursive_tag();
   if (left_rec_tag.size() == 0) return;
 
@@ -53,7 +58,7 @@ void GrammarNormalizer::normalize() {
     grammar->lines[new_line_name].rules.push_back(modified_removed_rule);
   }
 
-  normalize();
+  eliminate_left_recursive();
 }
 
 string GrammarNormalizer::get_left_recursive_tag() {
@@ -67,4 +72,23 @@ string GrammarNormalizer::get_left_recursive_tag() {
     }
   }
   return "";
+}
+
+void GrammarNormalizer::eliminate_premature_match() {
+  for (auto & line : grammar->lines) {
+    for (unsigned int i = 1; i < line.second.rules.size(); i++) {
+      for (int j = i - 1; j >= 0; j--) {
+        if (compare_rules(*(line.second.rules.begin() + i), *(line.second.rules.begin() + j)) == -1) {
+          iter_swap(line.second.rules.begin() + i, line.second.rules.begin() + j);
+        }
+      }
+    }
+  }
+}
+
+int GrammarNormalizer::compare_rules(GrammarRule lhs, GrammarRule rhs) {
+  for (unsigned int i = 0; i < min(lhs.parts.size(), rhs.parts.size()); i++) {
+    if (lhs.parts[i] != rhs.parts[i]) return 1;
+  }
+  return lhs.parts.size() > rhs.parts.size() ? -1 : 1;
 }
