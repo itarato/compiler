@@ -13,9 +13,6 @@ int mode_parse(int, char *[]);
 int mode_grammar_translate(int, char *[]);
 void print_help();
 
-// Receives:
-//  - grammar file name
-//  - source file name
 int main(int argc, char *argv[]) {
   if (argc <= 1) {
       print_help();
@@ -59,10 +56,10 @@ int mode_grammar_translate(int argc, char *argv[]) {
   }
 
   Grammar g(argv[2]);
-  cout << g << endl;
 
   GrammarNormalizer gn(&g);
   gn.normalize();
+
   cout << g << endl;
 
   return EXIT_SUCCESS;
