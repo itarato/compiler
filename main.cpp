@@ -63,6 +63,7 @@ int mode_grammar_translate(int argc, char *argv[]) {
 
   GrammarNormalizer gn(&g);
   gn.normalize();
+  cout << g << endl;
 
   return EXIT_SUCCESS;
 }

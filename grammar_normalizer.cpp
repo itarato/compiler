@@ -16,20 +16,13 @@ void GrammarNormalizer::normalize() {
   string left_rec_tag = get_left_recursive_tag();
   if (left_rec_tag.size() == 0) return;
 
+  auto & rec_rules = grammar->lines[left_rec_tag].rules;
+
   // Extract (and remove) left recursive rules.
   vector<GrammarRule> removed_rules;
   auto filter_fn = [left_rec_tag](GrammarRule &gr){ return gr.parts[0] == left_rec_tag; };
-  copy_if(
-    grammar->lines[left_rec_tag].rules.begin(),
-    grammar->lines[left_rec_tag].rules.end(),
-    back_inserter(removed_rules),
-    filter_fn
-  );
-  grammar->lines[left_rec_tag].rules.erase(remove_if(
-    grammar->lines[left_rec_tag].rules.begin(),
-    grammar->lines[left_rec_tag].rules.end(),
-    filter_fn
-  ));
+  copy_if(rec_rules.begin(), rec_rules.end(), back_inserter(removed_rules), filter_fn);
+  rec_rules.erase(remove_if(rec_rules.begin(), rec_rules.end(), filter_fn));
 
   // Create new rule for indirection.
   string new_line_name(left_rec_tag);
@@ -39,8 +32,8 @@ void GrammarNormalizer::normalize() {
   // Add proxies into old rule pointing to new rule.
   vector<GrammarRule> new_rules;
   transform(
-    grammar->lines[left_rec_tag].rules.begin(),
-    grammar->lines[left_rec_tag].rules.end(),
+    rec_rules.begin(),
+    rec_rules.end(),
     back_inserter(new_rules),
     [new_line_name](GrammarRule &rule){
       GrammarRule new_rule(rule);
@@ -48,11 +41,7 @@ void GrammarNormalizer::normalize() {
       return new_rule;
     }
   );
-  copy(
-    new_rules.begin(),
-    new_rules.end(),
-    back_inserter(grammar->lines[left_rec_tag].rules)
-  );
+  copy(new_rules.begin(), new_rules.end(), back_inserter(rec_rules));
 
   // Fill up new rule.
   for (auto &removed_rule : removed_rules) {

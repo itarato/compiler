@@ -13,8 +13,9 @@ public:
   void add_rule(GrammarRule);
 
   friend ostream & operator<<(ostream & os, const GrammarLine & self) {
-    for (auto const rule : self.rules) {
-      os << rule << " ";
+    for (auto it = self.rules.begin(); it != self.rules.end(); it++) {
+      os << *it;
+      if ((it + 1) != self.rules.end()) os << "| ";
     }
     return os;
   };

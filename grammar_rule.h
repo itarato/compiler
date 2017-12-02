@@ -14,9 +14,7 @@ public:
   void add_part(string);
 
   friend ostream & operator<<(ostream & os, const GrammarRule & self) {
-    os << "{ ";
     copy(self.parts.begin(), self.parts.end(), ostream_iterator<string>(os, " "));
-    os << "}";
     return os;
   }
 };
