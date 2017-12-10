@@ -10,6 +10,7 @@
 using namespace std;
 
 int mode_parse(int, char *[]);
+int mode_llparse(int, char *[]);
 int mode_grammar_translate(int, char *[]);
 void print_help();
 
@@ -23,6 +24,8 @@ int main(int argc, char *argv[]) {
     exit(mode_parse(argc, argv));
   } else if (strcmp(argv[1], "grammar") == 0) {
     exit(mode_grammar_translate(argc, argv));
+  } else if (strcmp(argv[1], "llparse") == 0) {
+    exit(mode_llparse(argc, argv));
   }
 
   exit(EXIT_FAILURE);
@@ -46,6 +49,10 @@ int mode_parse(int argc, char *argv[]) {
   if (p_ast_node != nullptr)
     cout << *p_ast_node << endl;
 
+  return EXIT_SUCCESS;
+}
+
+int mode_llparse(int argc, char *argv[]) {
   return EXIT_SUCCESS;
 }
 
