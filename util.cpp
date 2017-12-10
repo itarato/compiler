@@ -15,6 +15,8 @@ ostream & operator<<(ostream & os, const TokenType & self) {
     _enum_case(KW_IF);
     _enum_case(BRACE_OPEN);
     _enum_case(BRACE_CLOSE);
+    _enum_case(PAREN_OPEN);
+    _enum_case(PAREN_CLOSE);
     _enum_case(INVALID);
   }
   return os;

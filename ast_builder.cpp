@@ -73,7 +73,6 @@ AstNode * AstBuilder::try_grammar_rule(GrammarRule *rule, vec_iter_t *token_it, 
         (*token_it)++;
       } else {
         // Abort
-
         delete p_ast_node;
 
         cout << indent_str() << "N" << endl;
@@ -84,7 +83,6 @@ AstNode * AstBuilder::try_grammar_rule(GrammarRule *rule, vec_iter_t *token_it, 
       AstNode * p_part_ast_node = try_grammar_line(&grammar->lines[rule_part], token_it, rule_part);
       if (p_part_ast_node == nullptr) {
         // Abort
-
         delete p_ast_node;
 
         cout << indent_str() << "N" << endl;
@@ -122,5 +120,7 @@ bool AstBuilder::is_token_match(string rule_part, Token token) {
     (rule_part == RULE_T_EOP && token.type == TokenType::EOP) ||
     (rule_part == RULE_T_BRACE_OPEN && token.type == TokenType::BRACE_OPEN) ||
     (rule_part == RULE_T_BRACE_CLOSE && token.type == TokenType::BRACE_CLOSE) ||
+    (rule_part == RULE_T_PAREN_OPEN && token.type == TokenType::PAREN_OPEN) ||
+    (rule_part == RULE_T_PAREN_CLOSE && token.type == TokenType::PAREN_CLOSE) ||
     (rule_part == RULE_T_KW_IF && token.type == TokenType::KW_IF);
 }

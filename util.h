@@ -20,10 +20,12 @@ using namespace std;
 #define RULE_T_BRACE_OPEN "T_BRACE_OPEN"
 #define RULE_T_BRACE_CLOSE "T_BRACE_CLOSE"
 #define RULE_T_KW_IF "T_KW_IF"
+#define RULE_T_PAREN_OPEN "T_PAREN_OPEN"
+#define RULE_T_PAREN_CLOSE "T_PAREN_CLOSE"
 
 enum TokenType {
   NAME,
-  
+
   NUMBER,
 
   OP_ADD,
@@ -39,6 +41,9 @@ enum TokenType {
 
   BRACE_OPEN,
   BRACE_CLOSE,
+
+  PAREN_OPEN,
+  PAREN_CLOSE,
 
   EOP,
 

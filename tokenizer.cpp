@@ -1,6 +1,7 @@
 #include <vector>
 #include <iostream>
 #include <fstream>
+#include <ctype.h>
 
 #include "tokenizer.h"
 #include "util.h"
@@ -37,6 +38,12 @@ Token Tokenizer::get_token(ifstream *source_if) {
   } else if (ch == '}') {
     source_if->get();
     return Token(TokenType::BRACE_CLOSE, string{ch});
+  } else if (ch == '(') {
+    source_if->get();
+    return Token(TokenType::PAREN_OPEN, string{ch});
+  } else if (ch == ')') {
+    source_if->get();
+    return Token(TokenType::PAREN_CLOSE, string{ch});
   } else if (is_letter(ch)) {
     string s = read_char_list_token(source_if);
     if (is_keyword(s)) {
@@ -97,13 +104,4 @@ bool Tokenizer::is_letter(char ch) { return ch >= 'a' && ch <= 'z'; };
 
 bool Tokenizer::is_op(char ch) { return ch == '+' || ch == '-' || ch == '*' || ch == '/' || ch == '<' || ch == '>'; };
 
-bool Tokenizer::is_whitespace(char ch) {
-  return !(
-    is_numeric(ch) ||
-    is_letter(ch) ||
-    is_op(ch) ||
-    ch == ';' ||
-    ch == EOF ||
-    ch == '}' ||
-    ch == '{');
-};
+bool Tokenizer::is_whitespace(char ch) { return isspace(ch); };
