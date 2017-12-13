@@ -22,4 +22,5 @@ public:
 private:
   void build_flat_grammar_version();
   bool validate_grammar();
+  void build_token_decision_matrix();
 };
