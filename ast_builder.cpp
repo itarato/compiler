@@ -11,6 +11,7 @@
 #include "grammar_line.h"
 #include "ast_node_part.h"
 #include "ast_node.h"
+#include "util.h"
 
 using namespace std;
 
@@ -100,10 +101,6 @@ AstNode * AstBuilder::try_grammar_rule(GrammarRule *rule, vec_iter_t *token_it, 
   cout << indent_str() << "Y" << endl;
   indent--;
   return p_ast_node;
-}
-
-bool AstBuilder::is_token(string rule_part) {
-  return rule_part.at(0) == 'T' && rule_part.at(1) == '_';
 }
 
 bool AstBuilder::is_token_match(string rule_part, Token token) {

@@ -51,3 +51,5 @@ enum TokenType {
 };
 
 ostream & operator<<(ostream &, const TokenType &);
+
+bool is_token(string);

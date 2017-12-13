@@ -21,3 +21,7 @@ ostream & operator<<(ostream & os, const TokenType & self) {
   }
   return os;
 }
+
+bool is_token(string rule_part) {
+  return rule_part.at(0) == 'T' && rule_part.at(1) == '_';
+}
