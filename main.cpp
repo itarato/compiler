@@ -6,6 +6,7 @@
 #include "ast_builder.h"
 #include "ast_node.h"
 #include "grammar_normalizer.h"
+#include "ll_ast_builder.h"
 
 using namespace std;
 
@@ -53,6 +54,20 @@ int mode_parse(int argc, char *argv[]) {
 }
 
 int mode_llparse(int argc, char *argv[]) {
+  if (argc != 4) {
+    print_help();
+    return EXIT_FAILURE;
+  }
+
+  Grammar g(argv[2]);
+  cout << g << endl;
+
+  Tokenizer t(argv[3]);
+  cout << t << endl;
+
+  LLAstBuilder llab(&g, &t);
+  llab.build();
+
   return EXIT_SUCCESS;
 }
 
