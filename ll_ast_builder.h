@@ -11,17 +11,18 @@
 
 using namespace std;
 
-struct FlarGrammarRule {
+struct FlatGrammarRule {
   string rule_name;
   GrammarRule rule;
   vector<string> reached_tokens;
 };
+void print_flat_grammar_rules(vector<FlatGrammarRule>);
 
 class LLAstBuilder {
 public:
   Grammar *grammar;
   Tokenizer *tokenizer;
-  vector<FlarGrammarRule> flat_grammar;
+  vector<FlatGrammarRule> flat_grammar;
 
   LLAstBuilder(Grammar *, Tokenizer *);
   AstNode * build();

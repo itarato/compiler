@@ -5,12 +5,22 @@
 #include "ll_ast_builder.h"
 #include "ast_node.h"
 
+void print_flat_grammar_rules(vector<FlatGrammarRule> fgr) {
+  cout << "Grammar / decision list:\n";
+  for (auto & rule : fgr) {
+    cout << rule.rule_name << " :> " << rule.rule << "( ";
+    copy(rule.reached_tokens.begin(), rule.reached_tokens.end(), ostream_iterator<string>(cout, " "));
+    cout << ")\n";
+  }
+}
+
 LLAstBuilder::LLAstBuilder(Grammar *g, Tokenizer *t) : grammar(g), tokenizer(t) {
   build_flat_grammar_version();
 };
 
 AstNode * LLAstBuilder::build() {
   build_token_decision_matrix();
+  print_flat_grammar_rules(flat_grammar);
 
   if (!validate_grammar()) {
     cout << "Invalid grammar for LL parser.\n";
