@@ -1,6 +1,8 @@
 #include <iostream>
 #include <algorithm>
 #include <iterator>
+#include <set>
+#include <map>
 
 #include "ll_ast_builder.h"
 #include "ast_node.h"
@@ -31,7 +33,22 @@ AstNode * LLAstBuilder::build() {
 }
 
 bool LLAstBuilder::validate_grammar() {
-  return false;
+  map<string, set<string>> m;
+
+  for (auto & flat_grammar_rule : flat_grammar) {
+    if (m.find(flat_grammar_rule.rule_name) == m.end()) {
+      m[flat_grammar_rule.rule_name] = {};
+    }
+
+    for (auto & token_raw : flat_grammar_rule.reached_tokens) {
+      if (m[flat_grammar_rule.rule_name].find(token_raw) != m[flat_grammar_rule.rule_name].end()) {
+        return false;
+      }
+      m[flat_grammar_rule.rule_name].insert(token_raw);
+    }
+  }
+
+  return true;
 }
 
 void LLAstBuilder::build_flat_grammar_version() {
