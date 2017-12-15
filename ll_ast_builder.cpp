@@ -7,6 +7,7 @@
 #include "ll_ast_builder.h"
 #include "ast_node.h"
 #include "token.h"
+#include "util.h"
 
 void print_flat_grammar_rules(vector<FlatGrammarRule> fgr) {
   cout << "Grammar / decision list:\n";
@@ -23,34 +24,19 @@ LLAstBuilder::LLAstBuilder(Grammar *g, Tokenizer *t) : grammar(g), tokenizer(t) 
 AstNode * LLAstBuilder::build() {
   print_flat_grammar_rules(flat_grammar);
 
-  if (!validate_grammar()) {
-    cout << "Invalid grammar for LL parser.\n";
-    return nullptr;
-  }
-
   vector<Token> source_tokens(tokenizer->tokens);
   vector<string> rule_tokens({"PROG"});
 
+  while (rule_tokens.size() > 0 && source_tokens.size() > 0) {
+    if (token_eq(rule_tokens.back(), source_tokens.back().type)) {
+
+    } else {
+
+    }
+    return nullptr; // Mid commit safety.
+  }
+
   return nullptr;
-}
-
-bool LLAstBuilder::validate_grammar() {
-  // map<string, set<string>> m;
-  //
-  // for (auto & flat_grammar_rule : flat_grammar) {
-  //   if (m.find(flat_grammar_rule.rule_name) == m.end()) {
-  //     m[flat_grammar_rule.rule_name] = {};
-  //   }
-  //
-  //   for (auto & token_raw : flat_grammar_rule.reached_tokens) {
-  //     if (m[flat_grammar_rule.rule_name].find(token_raw) != m[flat_grammar_rule.rule_name].end()) {
-  //       return false;
-  //     }
-  //     m[flat_grammar_rule.rule_name].insert(token_raw);
-  //   }
-  // }
-
-  return true;
 }
 
 void LLAstBuilder::build_flat_grammar_version() {
@@ -61,6 +47,17 @@ void LLAstBuilder::build_flat_grammar_version() {
       flat_grammar.push_back({rule_name, rule});
       vector<string> reached_tokens = find_starting_tokens(rule);
       for (auto & reached_token : reached_tokens) {
+        // Validate grammar - LL1 is not that strong - easy to have multiple nonterminals for terminals.
+        if (
+          rule_lookup.find(rule_name) != rule_lookup.end() &&
+          rule_lookup[rule_name].find(reached_token) != rule_lookup[rule_name].end()
+        ) {
+          cout << "Invalid grammar - terminal token can be reached from multiple non terminal.\n";
+          cout << "Collision: " << rule_name << " - " << reached_token << " : " << rule_lookup[rule_name][reached_token] << " vs " << idx << " in\n";
+          print_flat_grammar_rules(flat_grammar);
+          exit(EXIT_FAILURE);
+        }
+
         rule_lookup[rule_name][reached_token] = idx;
       }
 
@@ -97,3 +94,4 @@ vector<string> LLAstBuilder::find_starting_tokens(GrammarRule rule) {
 
   return out;
 }
+

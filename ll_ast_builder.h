@@ -30,7 +30,6 @@ public:
 
 private:
   void build_flat_grammar_version();
-  bool validate_grammar();
   vector<string> find_starting_tokens(GrammarRule);
   void print_rule_lookup();
 };
