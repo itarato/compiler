@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <string>
+#include <map>
 
 #include "tokenizer.h"
 #include "grammar.h"
@@ -14,7 +15,6 @@ using namespace std;
 struct FlatGrammarRule {
   string rule_name;
   GrammarRule rule;
-  vector<string> reached_tokens;
 };
 void print_flat_grammar_rules(vector<FlatGrammarRule>);
 
@@ -23,6 +23,7 @@ public:
   Grammar *grammar;
   Tokenizer *tokenizer;
   vector<FlatGrammarRule> flat_grammar;
+  map<string, map<string, unsigned int>> rule_lookup;
 
   LLAstBuilder(Grammar *, Tokenizer *);
   AstNode * build();
@@ -30,6 +31,6 @@ public:
 private:
   void build_flat_grammar_version();
   bool validate_grammar();
-  void build_token_decision_matrix();
   vector<string> find_starting_tokens(GrammarRule);
+  void print_rule_lookup();
 };

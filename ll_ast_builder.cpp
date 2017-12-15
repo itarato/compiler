@@ -6,13 +6,13 @@
 
 #include "ll_ast_builder.h"
 #include "ast_node.h"
+#include "token.h"
 
 void print_flat_grammar_rules(vector<FlatGrammarRule> fgr) {
   cout << "Grammar / decision list:\n";
+  unsigned int idx = 0;
   for (auto & rule : fgr) {
-    cout << rule.rule_name << " :> " << rule.rule << "( ";
-    copy(rule.reached_tokens.begin(), rule.reached_tokens.end(), ostream_iterator<string>(cout, " "));
-    cout << ")\n";
+    cout << "#" << idx++ << " " << rule.rule_name << " :> " << rule.rule << endl;
   }
 }
 
@@ -21,7 +21,6 @@ LLAstBuilder::LLAstBuilder(Grammar *g, Tokenizer *t) : grammar(g), tokenizer(t) 
 };
 
 AstNode * LLAstBuilder::build() {
-  build_token_decision_matrix();
   print_flat_grammar_rules(flat_grammar);
 
   if (!validate_grammar()) {
@@ -29,40 +28,57 @@ AstNode * LLAstBuilder::build() {
     return nullptr;
   }
 
+  vector<Token> source_tokens(tokenizer->tokens);
+  vector<string> rule_tokens({"PROG"});
+
   return nullptr;
 }
 
 bool LLAstBuilder::validate_grammar() {
-  map<string, set<string>> m;
-
-  for (auto & flat_grammar_rule : flat_grammar) {
-    if (m.find(flat_grammar_rule.rule_name) == m.end()) {
-      m[flat_grammar_rule.rule_name] = {};
-    }
-
-    for (auto & token_raw : flat_grammar_rule.reached_tokens) {
-      if (m[flat_grammar_rule.rule_name].find(token_raw) != m[flat_grammar_rule.rule_name].end()) {
-        return false;
-      }
-      m[flat_grammar_rule.rule_name].insert(token_raw);
-    }
-  }
+  // map<string, set<string>> m;
+  //
+  // for (auto & flat_grammar_rule : flat_grammar) {
+  //   if (m.find(flat_grammar_rule.rule_name) == m.end()) {
+  //     m[flat_grammar_rule.rule_name] = {};
+  //   }
+  //
+  //   for (auto & token_raw : flat_grammar_rule.reached_tokens) {
+  //     if (m[flat_grammar_rule.rule_name].find(token_raw) != m[flat_grammar_rule.rule_name].end()) {
+  //       return false;
+  //     }
+  //     m[flat_grammar_rule.rule_name].insert(token_raw);
+  //   }
+  // }
 
   return true;
 }
 
 void LLAstBuilder::build_flat_grammar_version() {
+  unsigned int idx = 0;
   for (auto & line_pair : grammar->lines) {
     string rule_name(line_pair.first);
     for (auto & rule : line_pair.second.rules) {
-      flat_grammar.push_back({rule_name, rule, find_starting_tokens(rule)});
+      flat_grammar.push_back({rule_name, rule});
+      vector<string> reached_tokens = find_starting_tokens(rule);
+      for (auto & reached_token : reached_tokens) {
+        rule_lookup[rule_name][reached_token] = idx;
+      }
+
+      idx++;
     }
+
   }
+
+  print_rule_lookup();
 }
 
-void LLAstBuilder::build_token_decision_matrix() {
-  for (unsigned int i = 0; i < flat_grammar.size(); i++) {
-    cout << flat_grammar[i].rule_name << endl;
+void LLAstBuilder::print_rule_lookup() {
+  cout << "Rule lookup matrix:\n";
+
+  for (auto & rule_lookup_pair : rule_lookup) {
+    for (auto & token_pair : rule_lookup_pair.second) {
+      cout << "[" << rule_lookup_pair.first << ", " << token_pair.first << "] -> " << token_pair.second << endl;
+    }
   }
 }
 
