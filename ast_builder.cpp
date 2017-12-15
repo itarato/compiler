@@ -97,27 +97,11 @@ AstNode * AstBuilder::try_grammar_rule(GrammarRule *rule, vec_iter_t *token_it, 
   }
 
   // register the AstNode
-
   cout << indent_str() << "Y" << endl;
   indent--;
   return p_ast_node;
 }
 
 bool AstBuilder::is_token_match(string rule_part, Token token) {
-  return
-    (rule_part == RULE_T_NAME && token.type == TokenType::NAME) ||
-    (rule_part == RULE_T_NUMBER && token.type == TokenType::NUMBER) ||
-    (rule_part == RULE_T_ADD && token.type == TokenType::OP_ADD) ||
-    (rule_part == RULE_T_SUB && token.type == TokenType::OP_SUB) ||
-    (rule_part == RULE_T_MUL && token.type == TokenType::OP_MUL) ||
-    (rule_part == RULE_T_DIV && token.type == TokenType::OP_DIV) ||
-    (rule_part == RULE_T_LT && token.type == TokenType::OP_LT) ||
-    (rule_part == RULE_T_GT && token.type == TokenType::OP_GT) ||
-    (rule_part == RULE_T_SEMICOLON && token.type == TokenType::SEMICOLON) ||
-    (rule_part == RULE_T_EOP && token.type == TokenType::EOP) ||
-    (rule_part == RULE_T_BRACE_OPEN && token.type == TokenType::BRACE_OPEN) ||
-    (rule_part == RULE_T_BRACE_CLOSE && token.type == TokenType::BRACE_CLOSE) ||
-    (rule_part == RULE_T_PAREN_OPEN && token.type == TokenType::PAREN_OPEN) ||
-    (rule_part == RULE_T_PAREN_CLOSE && token.type == TokenType::PAREN_CLOSE) ||
-    (rule_part == RULE_T_KW_IF && token.type == TokenType::KW_IF);
+  return token_eq(rule_part, token.type);
 }
