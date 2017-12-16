@@ -26,18 +26,58 @@ LLAstBuilder::LLAstBuilder(Grammar *g, Tokenizer *t)
 AstNode *LLAstBuilder::build() {
     print_flat_grammar_rules(flat_grammar);
 
-    vector<Token> source_tokens(tokenizer->tokens);
+    vector<Token> source_tokens;
+    copy(tokenizer->tokens.rbegin(), tokenizer->tokens.rend(),
+         back_inserter(source_tokens));
     vector<string> rule_tokens({"PROG"});
 
-  while (!rule_tokens.empty() && !source_tokens.empty()) {
+    while (!rule_tokens.empty() && !source_tokens.empty()) {
+        cout << "\x1B[92mR\\\x1B[0m ";
+        copy(rule_tokens.rbegin(), rule_tokens.rend(),
+             ostream_iterator<string>(cout, " "));
+        cout << endl;
+        cout << "\x1B[92mS/\x1B[0m ";
+        for (auto it = source_tokens.rbegin(); it != source_tokens.rend(); it++)
+            cout << token_e_to_s(it->type) << " ";
+        cout << endl << endl;
+
         if (token_eq(rule_tokens.back(), source_tokens.back().type)) {
+            cout << "Match - deterministic tokens: " << rule_tokens.back()
+                 << endl
+                 << endl;
+
             rule_tokens.pop_back();
             source_tokens.pop_back();
         } else {
-        }
-  }
+            // If rule is deterministic and not matching (prev cond).
+            if (is_token(rule_tokens.back())) {
+                cout << "Non matching deterministic token.\n";
+                exit(EXIT_FAILURE);
+            }
 
-  return nullptr;
+            // From the current first rule the deterministic source token is
+            // unreachable.
+            string source_token_string =
+                token_e_to_s(source_tokens.back().type);
+            if (rule_lookup[rule_tokens.back()].find(source_token_string) ==
+                rule_lookup[rule_tokens.back()].end()) {
+                cout << "No matching rule.\n";
+                exit(EXIT_FAILURE);
+            }
+
+            unsigned int rule_idx =
+                rule_lookup[rule_tokens.back()]
+                           [token_e_to_s(source_tokens.back().type)];
+            cout << "Expand rule: #" << rule_idx << endl << endl;
+
+            rule_tokens.pop_back();
+            copy(flat_grammar[rule_idx].rule.parts.rbegin(),
+                 flat_grammar[rule_idx].rule.parts.rend(),
+                 back_inserter(rule_tokens));
+        }
+    }
+
+    return nullptr;
 }
 
 void LLAstBuilder::build_flat_grammar_version() {
