@@ -29,7 +29,7 @@ AstNode *LLAstBuilder::build() {
     vector<Token> source_tokens;
     copy(tokenizer->tokens.rbegin(), tokenizer->tokens.rend(),
          back_inserter(source_tokens));
-    vector<string> rule_tokens({"PROG"});
+    vector<string> rule_tokens({START_RULE});
 
     while (!rule_tokens.empty() && !source_tokens.empty()) {
         cout << "\x1B[92mR\\\x1B[0m ";
@@ -61,13 +61,16 @@ AstNode *LLAstBuilder::build() {
                 token_e_to_s(source_tokens.back().type);
             if (rule_lookup[rule_tokens.back()].find(source_token_string) ==
                 rule_lookup[rule_tokens.back()].end()) {
-                cout << "No matching rule.\n";
-                exit(EXIT_FAILURE);
+                if (rule_lookup[rule_tokens.back()].find(T_EMPTY) ==
+                    rule_lookup[rule_tokens.back()].end()) {
+                    cout << "No matching rule.\n";
+                    exit(EXIT_FAILURE);
+                }
+                source_token_string = T_EMPTY;
             }
 
             unsigned int rule_idx =
-                rule_lookup[rule_tokens.back()]
-                           [token_e_to_s(source_tokens.back().type)];
+                rule_lookup[rule_tokens.back()][source_token_string];
             cout << "Expand rule: #" << rule_idx << endl << endl;
 
             rule_tokens.pop_back();
@@ -124,9 +127,9 @@ void LLAstBuilder::print_rule_lookup() {
 }
 
 vector<string> LLAstBuilder::find_starting_tokens(GrammarRule rule) {
-    vector<string> out;
-    if (rule.parts.size() == 0) return out;
+    if (rule.parts.size() == 0) return {T_EMPTY};
 
+    vector<string> out;
     if (is_token(rule.parts[0])) {
         out.push_back(rule.parts[0]);
     } else {
