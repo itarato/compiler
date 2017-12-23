@@ -14,6 +14,7 @@ enum TokenType {
     NAME,
 
     NUMBER,
+    STRING,
 
     OP_ADD,
     OP_SUB,

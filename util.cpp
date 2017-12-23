@@ -8,6 +8,7 @@ ostream& operator<<(ostream& os, const TokenType& self) {
 map<string, TokenType> token_translation_map{
     {"T_NAME", TokenType::NAME},
     {"T_NUMBER", TokenType::NUMBER},
+    {"T_STRING", TokenType::STRING},
     {"T_ADD", TokenType::OP_ADD},
     {"T_SUB", TokenType::OP_SUB},
     {"T_MUL", TokenType::OP_MUL},
