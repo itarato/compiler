@@ -92,7 +92,7 @@ Token Tokenizer::read_string_token(ifstream *source_if) {
 
 string Tokenizer::read_char_list_token(ifstream *source_if) {
     string value;
-    while (is_letter(source_if->peek())) {
+    while (is_letter(source_if->peek()) || is_numeric(source_if->peek())) {
         value.push_back(source_if->get());
     }
     return value;
