@@ -25,6 +25,7 @@ map<string, TokenType> token_translation_map{
     {"T_KW_FN", TokenType::KW_FN},
     {"T_PAREN_OPEN", TokenType::PAREN_OPEN},
     {"T_PAREN_CLOSE", TokenType::PAREN_CLOSE},
+    {"T_ASSIGN", TokenType::ASSIGN},
     {T_EMPTY, TokenType::EMPTY},
 };
 

@@ -23,6 +23,8 @@ enum TokenType {
     OP_LT,
     OP_GT,
 
+    ASSIGN,
+
     SEMICOLON,
 
     KW_IF,

@@ -35,4 +35,5 @@ class Tokenizer {
     bool is_op(char);
     bool is_whitespace(char);
     bool is_quote(char);
+    bool is_eq(char);
 };

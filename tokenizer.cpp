@@ -32,6 +32,9 @@ Token Tokenizer::get_token(ifstream *source_if) {
     } else if (is_op(ch)) {
         source_if->get();
         return read_op_token(ch);
+    } else if (is_eq(ch)) {
+        source_if->get();
+        return Token(TokenType::ASSIGN, string{ch});
     } else if (ch == ';') {
         source_if->get();
         return Token(TokenType::SEMICOLON, string{ch});
@@ -127,3 +130,5 @@ bool Tokenizer::is_op(char ch) {
 bool Tokenizer::is_whitespace(char ch) { return isspace(ch); }
 
 bool Tokenizer::is_quote(char ch) { return ch == '"' || ch == '\''; }
+
+bool Tokenizer::is_eq(char ch) { return ch == '='; }
