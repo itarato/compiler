@@ -1,5 +1,14 @@
 puts 2 + 3 - 1;
 
+fn something() {
+    foo 1;
+    exit 0;
+}
+
+fn foo(a, b, c) {
+    puts "some";
+}
+
 v1 = 2;
 v2 = 1 + 3;
 

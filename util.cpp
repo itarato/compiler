@@ -16,6 +16,7 @@ map<string, TokenType> token_translation_map{
     {"T_LT", TokenType::OP_LT},
     {"T_GT", TokenType::OP_GT},
     {"T_EOP", TokenType::EOP},
+    {"T_COMMA", TokenType::COMMA},
     {"T_SEMICOLON", TokenType::SEMICOLON},
     {"T_BRACE_OPEN", TokenType::BRACE_OPEN},
     {"T_BRACE_CLOSE", TokenType::BRACE_CLOSE},
@@ -31,9 +32,9 @@ map<string, TokenType> token_translation_map{
 
 map<string, TokenType> keyword_translation_map{
     {"if", TokenType::KW_IF},
-    {"while", TokenType::KW_IF},
-    {"for", TokenType::KW_IF},
-    {"fn", TokenType::KW_IF},
+    {"while", TokenType::KW_WHILE},
+    {"for", TokenType::KW_FOR},
+    {"fn", TokenType::KW_FN},
 };
 
 bool is_token(string rule_part) {

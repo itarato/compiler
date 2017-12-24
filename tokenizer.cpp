@@ -35,6 +35,9 @@ Token Tokenizer::get_token(ifstream *source_if) {
     } else if (is_eq(ch)) {
         source_if->get();
         return Token(TokenType::ASSIGN, string{ch});
+    } else if (ch == ',') {
+        source_if->get();
+        return Token(TokenType::COMMA, string{ch});
     } else if (ch == ';') {
         source_if->get();
         return Token(TokenType::SEMICOLON, string{ch});

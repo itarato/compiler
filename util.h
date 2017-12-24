@@ -25,6 +25,7 @@ enum TokenType {
 
     ASSIGN,
 
+    COMMA,
     SEMICOLON,
 
     KW_IF,
