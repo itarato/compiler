@@ -60,13 +60,12 @@ Token Tokenizer::get_token(ifstream *source_if) {
     }
 }
 
-bool Tokenizer::is_keyword(string s) { return s == "if"; }
+bool Tokenizer::is_keyword(string s) {
+    return keyword_translation_map.find(s) != keyword_translation_map.end();
+}
 
 Token Tokenizer::wrap_keyword(string s) {
-    if (s == "if") {
-        return Token(TokenType::KW_IF, s);
-    }
-    exit(EXIT_FAILURE);
+    return Token(keyword_translation_map[s], s);
 }
 
 Token Tokenizer::read_number_token(ifstream *source_if) {

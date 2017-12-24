@@ -3,3 +3,6 @@ puts 2 + 3 - 1;
 if 2 < 3 {
   puts "hello";
 }
+
+while 1 < 3 {
+}

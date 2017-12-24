@@ -20,9 +20,19 @@ map<string, TokenType> token_translation_map{
     {"T_BRACE_OPEN", TokenType::BRACE_OPEN},
     {"T_BRACE_CLOSE", TokenType::BRACE_CLOSE},
     {"T_KW_IF", TokenType::KW_IF},
+    {"T_KW_WHILE", TokenType::KW_WHILE},
+    {"T_KW_FOR", TokenType::KW_FOR},
+    {"T_KW_FN", TokenType::KW_FN},
     {"T_PAREN_OPEN", TokenType::PAREN_OPEN},
     {"T_PAREN_CLOSE", TokenType::PAREN_CLOSE},
     {T_EMPTY, TokenType::EMPTY},
+};
+
+map<string, TokenType> keyword_translation_map{
+    {"if", TokenType::KW_IF},
+    {"while", TokenType::KW_IF},
+    {"for", TokenType::KW_IF},
+    {"fn", TokenType::KW_IF},
 };
 
 bool is_token(string rule_part) {

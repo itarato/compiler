@@ -26,6 +26,9 @@ enum TokenType {
     SEMICOLON,
 
     KW_IF,
+    KW_WHILE,
+    KW_FOR,
+    KW_FN,
 
     BRACE_OPEN,
     BRACE_CLOSE,
@@ -46,3 +49,6 @@ bool token_eq(string, TokenType);
 ostream &operator<<(ostream &, const TokenType &);
 
 bool is_token(string);
+
+extern map<string, TokenType> token_translation_map;
+extern map<string, TokenType> keyword_translation_map;
