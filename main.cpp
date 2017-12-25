@@ -1,4 +1,5 @@
 #include <cstring>
+#include <fstream>
 #include <iostream>
 
 #include "ast_builder.h"
@@ -42,7 +43,9 @@ int mode_parse(int argc, char *argv[]) {
         return EXIT_FAILURE;
     }
 
-    Grammar g(argv[2]);
+    ifstream ifs(argv[2]);
+    istream_iterator<string> isi(ifs);
+    Grammar g(isi);
     cout << g << endl;
 
     Tokenizer t(argv[3]);
@@ -62,7 +65,9 @@ int mode_llparse(int argc, char *argv[]) {
         return EXIT_FAILURE;
     }
 
-    Grammar g(argv[2]);
+    ifstream ifs(argv[2]);
+    istream_iterator<string> isi(ifs);
+    Grammar g(isi);
     cout << g << endl;
 
     Tokenizer t(argv[3]);
@@ -70,7 +75,6 @@ int mode_llparse(int argc, char *argv[]) {
 
     LLAstBuilder llab(&g, &t);
     llab.build();
-
     return EXIT_SUCCESS;
 }
 
@@ -80,13 +84,14 @@ int mode_grammar_translate(int argc, char *argv[]) {
         return EXIT_FAILURE;
     }
 
-    Grammar g(argv[2]);
+    ifstream ifs(argv[2]);
+    istream_iterator<string> isi(ifs);
+    Grammar g(isi);
 
     GrammarNormalizer gn(&g);
     gn.normalize();
 
     cout << g << endl;
-
     return EXIT_SUCCESS;
 }
 

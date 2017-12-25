@@ -1,7 +1,8 @@
 #pragma once
 
-#include <map>
 #include <iostream>
+#include <iterator>
+#include <map>
 #include <string>
 
 #include "grammar_line.h"
@@ -9,19 +10,19 @@
 using namespace std;
 
 class Grammar {
-public:
-  map<string, GrammarLine> lines;
+   public:
+    map<string, GrammarLine> lines;
 
-  Grammar(char *);
+    Grammar(istream_iterator<string>);
 
-  bool is_line_def(string);
-  bool is_rule_divider(string);
-  void save_grammar_line(GrammarLine *, string);
+    bool is_line_def(string);
+    bool is_rule_divider(string);
+    void save_grammar_line(GrammarLine *, string);
 
-  friend ostream & operator<<(ostream & os, const Grammar & self) {
-    for (auto const line : self.lines) {
-      os << line.first << ": " << line.second << endl;
-    }
-    return os;
-  };
+    friend ostream &operator<<(ostream &os, const Grammar &self) {
+        for (auto const line : self.lines) {
+            os << line.first << ": " << line.second << endl;
+        }
+        return os;
+    };
 };
