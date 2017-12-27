@@ -25,6 +25,10 @@ class Test {
 
     void run() {
         test_grammar_basic();
+        test_grammar_multiline();
+        test_grammar_multiple_rules();
+        test_grammar_empty_rule();
+
         cout << endl
              << "COMPLETE - SUCCESS: " << success_count
              << " FAILURE : " << failure_count << endl
@@ -38,13 +42,37 @@ class Test {
     };
 
     void test_grammar_basic() {
-        Grammar g(make_grammar("PROG: "));
+        Grammar g(make_grammar("PROG: T_EOF"));
 
         ASSERT_EQUAL((size_t)1, g.lines.size());
         ASSERT(g.lines.find("PROG") != g.lines.end());
         ASSERT_EQUAL((size_t)1, g.lines["PROG"].rules.size());
-        ASSERT_EQUAL((size_t)0, g.lines["PROG"].rules[0].parts.size());
+        ASSERT_EQUAL((size_t)1, g.lines["PROG"].rules[0].parts.size());
+        ASSERT_EQUAL((string)"T_EOF", g.lines["PROG"].rules[0].parts[0]);
     };
+
+    void test_grammar_multiline() {
+        Grammar g(make_grammar("A: B\nB: T_C"));
+
+        ASSERT_EQUAL((size_t)2, g.lines.size());
+    }
+
+    void test_grammar_multiple_rules() {
+        Grammar g(make_grammar("A: B | C | D"));
+
+        ASSERT_EQUAL((size_t)3, g.lines["A"].rules.size());
+    }
+
+    void test_grammar_empty_rule() {
+        Grammar g1(make_grammar("A: "));
+        ASSERT_EQUAL((size_t)0, g1.lines["A"].rules[0].parts.size());
+
+        Grammar g2(make_grammar("A: B |"));
+        ASSERT_EQUAL((size_t)0, g2.lines["A"].rules[1].parts.size());
+
+        Grammar g3(make_grammar("A: B | | C"));
+        ASSERT_EQUAL((size_t)0, g3.lines["A"].rules[1].parts.size());
+    }
 
    private:
     Grammar make_grammar(string s) {
