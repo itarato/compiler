@@ -9,6 +9,7 @@
 #include <vector>
 
 #include "grammar.h"
+#include "tokenizer.h"
 
 using namespace std;
 
@@ -28,6 +29,7 @@ class Test {
         test_grammar_multiline();
         test_grammar_multiple_rules();
         test_grammar_empty_rule();
+        test_grammar_multiple_rule_parts();
 
         cout << endl
              << "COMPLETE - SUCCESS: " << success_count
@@ -40,6 +42,8 @@ class Test {
                  ostream_iterator<string>(cout, "\n"));
         }
     };
+
+    // GRAMMAR TESTS //////////////////////////////////////////////////////////
 
     void test_grammar_basic() {
         Grammar g(make_grammar("PROG: T_EOF"));
@@ -72,6 +76,18 @@ class Test {
 
         Grammar g3(make_grammar("A: B | | C"));
         ASSERT_EQUAL((size_t)0, g3.lines["A"].rules[1].parts.size());
+    }
+
+    void test_grammar_multiple_rule_parts() {
+        Grammar g(make_grammar("A: B C D"));
+
+        ASSERT_EQUAL((size_t)3, g.lines["A"].rules[0].parts.size());
+    }
+
+    // TOKENIZER TESTS ////////////////////////////////////////////////////////
+    
+    void test_tokenizer() {
+        //Tokenizer t()
     }
 
    private:
