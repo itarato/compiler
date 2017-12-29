@@ -1,10 +1,11 @@
 #include "grammar.h"
 
-#include <fstream>
 #include <iostream>
 #include <iterator>
 #include <map>
 #include <string>
+#include <fstream>
+#include <sstream>
 
 #include "grammar_line.h"
 #include "grammar_rule.h"
@@ -53,4 +54,16 @@ bool Grammar::is_rule_divider(string word) { return word == "|"; }
 void Grammar::save_grammar_line(GrammarLine *grammar_line, string name) {
     if (grammar_line == nullptr) return;
     lines[name] = *grammar_line;
+}
+
+Grammar new_grammar_from_filename(char *filename) {
+   ifstream ifs(filename);
+   istream_iterator<string> isit(ifs);
+   return Grammar(isit);
+}
+
+Grammar new_grammar_from_string(string raw) {
+    istringstream iss(raw);
+    istream_iterator<string> isit(iss);
+    return Grammar(isit);
 }

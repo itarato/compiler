@@ -1,60 +1,60 @@
 #include <ctype.h>
-#include <fstream>
 #include <iostream>
 #include <vector>
+#include <iterator>
+#include <sstream>
+#include <fstream>
 
 #include "tokenizer.h"
 #include "util.h"
 
 using namespace std;
 
-Tokenizer::Tokenizer(char *source_file_name) {
-    ifstream source_if(source_file_name);
-
+Tokenizer::Tokenizer(istream_iterator<char> _source_if) : source_if(_source_if) {
     for (;;) {
-        for (; is_whitespace(source_if.peek()); source_if.get()) {
+        for (; is_whitespace(*source_if) && !is_end(); source_if++) {
         }
 
-        if (source_if.peek() == EOF) break;
+        if (is_end()) break;
 
-        tokens.push_back(get_token(&source_if));
+        tokens.push_back(get_token());
     }
 
     tokens.push_back({TokenType::EOP, ""});
 }
 
-Token Tokenizer::get_token(ifstream *source_if) {
-    char ch = source_if->peek();
+Token Tokenizer::get_token() {
+    char ch = *source_if;
     if (is_numeric(ch)) {
-        return read_number_token(source_if);
+        return read_number_token();
     } else if (is_quote(ch)) {
-        return read_string_token(source_if);
+        return read_string_token();
     } else if (is_op(ch)) {
-        source_if->get();
+        source_if++;
         return read_op_token(ch);
     } else if (is_eq(ch)) {
-        source_if->get();
+        source_if++;
         return Token(TokenType::ASSIGN, string{ch});
     } else if (ch == ',') {
-        source_if->get();
+        source_if++;
         return Token(TokenType::COMMA, string{ch});
     } else if (ch == ';') {
-        source_if->get();
+        source_if++;
         return Token(TokenType::SEMICOLON, string{ch});
     } else if (ch == '{') {
-        source_if->get();
+        source_if++;
         return Token(TokenType::BRACE_OPEN, string{ch});
     } else if (ch == '}') {
-        source_if->get();
+        source_if++;
         return Token(TokenType::BRACE_CLOSE, string{ch});
     } else if (ch == '(') {
-        source_if->get();
+        source_if++;
         return Token(TokenType::PAREN_OPEN, string{ch});
     } else if (ch == ')') {
-        source_if->get();
+        source_if++;
         return Token(TokenType::PAREN_CLOSE, string{ch});
     } else if (is_letter(ch)) {
-        string s = read_char_list_token(source_if);
+        string s = read_char_list_token();
         if (is_keyword(s)) {
             return wrap_keyword(s);
         } else {
@@ -66,6 +66,10 @@ Token Tokenizer::get_token(ifstream *source_if) {
     }
 }
 
+bool Tokenizer::is_end() {
+    return source_if == istream_iterator<char>();
+}
+
 bool Tokenizer::is_keyword(string s) {
     return keyword_translation_map.find(s) != keyword_translation_map.end();
 }
@@ -74,29 +78,29 @@ Token Tokenizer::wrap_keyword(string s) {
     return Token(keyword_translation_map[s], s);
 }
 
-Token Tokenizer::read_number_token(ifstream *source_if) {
+Token Tokenizer::read_number_token() {
     string value;
-    while (is_numeric(source_if->peek())) {
-        value.push_back(source_if->get());
+    while (is_numeric(*source_if)) {
+        value.push_back(*(source_if++));
     }
     return Token(TokenType::NUMBER, value);
 }
 
-Token Tokenizer::read_string_token(ifstream *source_if) {
-    char quote = source_if->get();
+Token Tokenizer::read_string_token() {
+    char quote = *(source_if++);
 
     string value;
 
-    while (source_if->peek() != quote) value.push_back(source_if->get());
-    source_if->get();
+    while (*source_if != quote) value.push_back(*(source_if++));
+    source_if++;
 
     return Token(TokenType::STRING, value);
 }
 
-string Tokenizer::read_char_list_token(ifstream *source_if) {
+string Tokenizer::read_char_list_token() {
     string value;
-    while (is_letter(source_if->peek()) || is_numeric(source_if->peek())) {
-        value.push_back(source_if->get());
+    while (is_letter(*source_if) || is_numeric(*source_if)) {
+        value.push_back(*(source_if++));
     }
     return value;
 }
@@ -135,3 +139,18 @@ bool Tokenizer::is_whitespace(char ch) { return isspace(ch); }
 bool Tokenizer::is_quote(char ch) { return ch == '"' || ch == '\''; }
 
 bool Tokenizer::is_eq(char ch) { return ch == '='; }
+
+Tokenizer new_tokenizer_from_filename(char *filename) {
+    ifstream ifs(filename);
+    ifs >> noskipws;
+    istream_iterator<char> isit(ifs);
+    return Tokenizer(isit);
+}
+
+Tokenizer new_tokenizer_from_string(string raw) {
+    istringstream iss(raw);
+    iss >> noskipws;
+    istream_iterator<char> isit(iss);
+    return Tokenizer(isit);
+}
+

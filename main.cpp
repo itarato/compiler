@@ -43,12 +43,10 @@ int mode_parse(int argc, char *argv[]) {
         return EXIT_FAILURE;
     }
 
-    ifstream ifs(argv[2]);
-    istream_iterator<string> isi(ifs);
-    Grammar g(isi);
+    Grammar g(new_grammar_from_filename(argv[2]));
     cout << g << endl;
 
-    Tokenizer t(argv[3]);
+    Tokenizer t(new_tokenizer_from_filename(argv[3]));
     cout << t << endl;
 
     AstBuilder ab(&g, &t);
@@ -65,12 +63,10 @@ int mode_llparse(int argc, char *argv[]) {
         return EXIT_FAILURE;
     }
 
-    ifstream ifs(argv[2]);
-    istream_iterator<string> isi(ifs);
-    Grammar g(isi);
+    Grammar g(new_grammar_from_filename(argv[2]));
     cout << g << endl;
 
-    Tokenizer t(argv[3]);
+    Tokenizer t(new_tokenizer_from_filename(argv[3]));
     cout << t << endl;
 
     LLAstBuilder llab(&g, &t);

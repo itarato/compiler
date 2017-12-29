@@ -26,3 +26,6 @@ class Grammar {
         return os;
     };
 };
+
+Grammar new_grammar_from_filename(char*);
+Grammar new_grammar_from_string(string);

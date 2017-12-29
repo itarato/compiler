@@ -46,7 +46,7 @@ class Test {
     // GRAMMAR TESTS //////////////////////////////////////////////////////////
 
     void test_grammar_basic() {
-        Grammar g(make_grammar("PROG: T_EOF"));
+        Grammar g(new_grammar_from_string("PROG: T_EOF"));
 
         ASSERT_EQUAL((size_t)1, g.lines.size());
         ASSERT(g.lines.find("PROG") != g.lines.end());
@@ -56,30 +56,30 @@ class Test {
     };
 
     void test_grammar_multiline() {
-        Grammar g(make_grammar("A: B\nB: T_C"));
+        Grammar g(new_grammar_from_string("A: B\nB: T_C"));
 
         ASSERT_EQUAL((size_t)2, g.lines.size());
     }
 
     void test_grammar_multiple_rules() {
-        Grammar g(make_grammar("A: B | C | D"));
+        Grammar g(new_grammar_from_string("A: B | C | D"));
 
         ASSERT_EQUAL((size_t)3, g.lines["A"].rules.size());
     }
 
     void test_grammar_empty_rule() {
-        Grammar g1(make_grammar("A: "));
+        Grammar g1(new_grammar_from_string("A: "));
         ASSERT_EQUAL((size_t)0, g1.lines["A"].rules[0].parts.size());
 
-        Grammar g2(make_grammar("A: B |"));
+        Grammar g2(new_grammar_from_string("A: B |"));
         ASSERT_EQUAL((size_t)0, g2.lines["A"].rules[1].parts.size());
 
-        Grammar g3(make_grammar("A: B | | C"));
+        Grammar g3(new_grammar_from_string("A: B | | C"));
         ASSERT_EQUAL((size_t)0, g3.lines["A"].rules[1].parts.size());
     }
 
     void test_grammar_multiple_rule_parts() {
-        Grammar g(make_grammar("A: B C D"));
+        Grammar g(new_grammar_from_string("A: B C D"));
 
         ASSERT_EQUAL((size_t)3, g.lines["A"].rules[0].parts.size());
     }
@@ -91,12 +91,6 @@ class Test {
     }
 
    private:
-    Grammar make_grammar(string s) {
-        istringstream iss(s);
-        istream_iterator<string> isi(iss);
-        return Grammar(isi);
-    }
-
     void assert(const bool test, const char *caller_name,
                 unsigned int line_no) {
         if (test) {
