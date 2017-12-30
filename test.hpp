@@ -33,16 +33,20 @@ class Test {
 
         test_tokenizer_end_of_program_is_added_always();
         test_tokenizer_source_can_end_empty_or_newline();
+        test_tokenizer_ignores_whitespaces();
+        test_tokenizer_recognize_basic_token_types();
 
         cout << endl
-             << "COMPLETE - SUCCESS: " << success_count
-             << " FAILURE : " << failure_count << endl
+             << "\x1B[1mCOMPLETE\x1B[0m - \x1B[92mSUCCESS: " << success_count
+             << "\x1B[0m \x1B[91mFAILURE: " << failure_count << "\x1B[0m"
+             << endl
              << endl;
 
         if (errors.size() > 0) {
-            cout << "ERRORS:\n";
+            cout << "\x1B[91mERRORS:\n";
             copy(errors.begin(), errors.end(),
                  ostream_iterator<string>(cout, "\n"));
+            cout << "\x1B[0m";
         }
     };
 
@@ -112,19 +116,34 @@ class Test {
         }
     }
 
+    void test_tokenizer_ignores_whitespaces() {
+        vector<string> test_cases{"puts(", "puts (", "puts \t \n ("};
+
+        for (const auto &test_case : test_cases) {
+            Tokenizer t(new_tokenizer_from_string(test_case));
+            ASSERT_EQUAL((size_t)3, t.tokens.size());
+        }
+    }
+
+    void test_tokenizer_recognize_basic_token_types() {
+        test_tokenizer_recognize_type(TokenType::NAME, {"puts", "foo123", "b"});
+        test_tokenizer_recognize_type(TokenType::NUMBER, {"1", "0", "123"});
+        test_tokenizer_recognize_type(TokenType::OP_ADD, {"+"});
+    }
+
    private:
     void assert(const bool test, const char *caller_name,
                 unsigned int line_no) {
         if (test) {
             success_count++;
-            cout << '.';
+            cout << "\x1B[94m.\x1B[0m";
         } else {
             string error_message(caller_name);
             error_message += " at line ";
             error_message += to_string(line_no);
             errors.push_back(error_message);
             failure_count++;
-            cout << 'F';
+            cout << "\x1B[91mF\x1B[0m";
         }
     };
 
@@ -132,5 +151,15 @@ class Test {
     void assert_eq(const T lhs, const T rhs, const char *caller_name,
                    unsigned int line_no) {
         assert(lhs == rhs, caller_name, line_no);
+    }
+
+    void test_tokenizer_recognize_type(TokenType type,
+                                       vector<string> test_cases) {
+        for (const auto &test_case : test_cases) {
+            Tokenizer t(new_tokenizer_from_string(test_case));
+            ASSERT_EQUAL((size_t)2, t.tokens.size());
+            ASSERT_EQUAL(type, t.tokens[0].type);
+            ASSERT_EQUAL(test_case, t.tokens[0].value);
+        }
     }
 };
