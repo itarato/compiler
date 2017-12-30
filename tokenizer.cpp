@@ -80,7 +80,7 @@ Token Tokenizer::wrap_keyword(string s) {
 
 Token Tokenizer::read_number_token() {
     string value;
-    while (is_numeric(*source_if)) {
+    while (is_numeric(*source_if) && !is_end()) {
         value.push_back(*(source_if++));
     }
     return Token(TokenType::NUMBER, value);
@@ -91,7 +91,12 @@ Token Tokenizer::read_string_token() {
 
     string value;
 
-    while (*source_if != quote) value.push_back(*(source_if++));
+    while (*source_if != quote && !is_end()) value.push_back(*(source_if++));
+
+    if (*source_if != quote) {
+        cout << "Broken string value token - missing closing quote pair.\n";
+        exit(EXIT_FAILURE);
+    }
     source_if++;
 
     return Token(TokenType::STRING, value);
@@ -99,7 +104,7 @@ Token Tokenizer::read_string_token() {
 
 string Tokenizer::read_char_list_token() {
     string value;
-    while (is_letter(*source_if) || is_numeric(*source_if)) {
+    while ((is_letter(*source_if) || is_numeric(*source_if)) && !is_end()) {
         value.push_back(*(source_if++));
     }
     return value;
