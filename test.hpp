@@ -129,6 +129,35 @@ class Test {
         test_tokenizer_recognize_type(TokenType::NAME, {"puts", "foo123", "b"});
         test_tokenizer_recognize_type(TokenType::NUMBER, {"1", "0", "123"});
         test_tokenizer_recognize_type(TokenType::OP_ADD, {"+"});
+        test_tokenizer_recognize_type(TokenType::OP_SUB, {"-"});
+        test_tokenizer_recognize_type(TokenType::OP_MUL, {"*"});
+        test_tokenizer_recognize_type(TokenType::OP_DIV, {"/"});
+        test_tokenizer_recognize_type(TokenType::OP_GT, {">"});
+        test_tokenizer_recognize_type(TokenType::OP_LT, {"<"});
+        test_tokenizer_recognize_type(TokenType::ASSIGN, {"="});
+        test_tokenizer_recognize_type(TokenType::COMMA, {","});
+        test_tokenizer_recognize_type(TokenType::SEMICOLON, {";"});
+        test_tokenizer_recognize_type(TokenType::KW_IF, {"if"});
+        test_tokenizer_recognize_type(TokenType::KW_WHILE, {"while"});
+        test_tokenizer_recognize_type(TokenType::KW_FOR, {"for"});
+        test_tokenizer_recognize_type(TokenType::KW_FN, {"fn"});
+        test_tokenizer_recognize_type(TokenType::BRACE_OPEN, {"{"});
+        test_tokenizer_recognize_type(TokenType::BRACE_CLOSE, {"}"});
+        test_tokenizer_recognize_type(TokenType::PAREN_OPEN, {"("});
+        test_tokenizer_recognize_type(TokenType::PAREN_CLOSE, {")"});
+    }
+
+    void test_tokenizer_recognize_strings() {
+        Tokenizer t1(
+            new_tokenizer_from_string("\"fn 'while' puts foobar 123\""));
+        ASSERT_EQUAL((string) "fn 'while' puts foobar 123", t1.tokens[0].value);
+        ASSERT_EQUAL(TokenType::STRING, t1.tokens[0].type);
+
+        Tokenizer t2(
+            new_tokenizer_from_string("'fn \"while\" puts foobar 123'"));
+        ASSERT_EQUAL((string) "fn \"while\" puts foobar 123",
+                     t2.tokens[0].value);
+        ASSERT_EQUAL(TokenType::STRING, t2.tokens[0].type);
     }
 
    private:
