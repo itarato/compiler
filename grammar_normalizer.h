@@ -3,6 +3,7 @@
 #include <string>
 
 #include "grammar.h"
+#include "grammar_rule.h"
 
 using namespace std;
 

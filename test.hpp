@@ -12,6 +12,7 @@
 #include "ast_node.h"
 #include "grammar.h"
 #include "tokenizer.h"
+#include "grammar_normalizer.h"
 
 using namespace std;
 
@@ -40,6 +41,10 @@ class Test {
         test_tokenizer_recognize_multiple_tokens();
 
         test_ast_builder_examples();
+
+        test_grammar_normalizer_keeps_correct_grammar_as_is();
+        test_grammar_normalizer_fix_left_recursion();
+        test_grammar_normalizer_sort_rules_to_avoid_premature_match();
 
         cout << endl
              << "\x1B[1mCOMPLETE\x1B[0m - \x1B[92mSUCCESS: " << success_count
@@ -181,6 +186,26 @@ class Test {
         ASSERT_EQUAL((string) "{\"PROG\":[{\"EXPR\":[\"T_PAREN_OPEN(()\",{\"EXPR\":[\"T_PAREN_OPEN(()\",{\"EXPR\":[\"T_NUMBER(1)\"]},{\"OP\":[\"T_ADD(+)\"]},{\"EXPR\":[\"T_NUMBER(2)\"]},\"T_PAREN_CLOSE())\"]},{\"OP\":[\"T_ADD(+)\"]},{\"EXPR\":[\"T_PAREN_OPEN(()\",{\"EXPR\":[\"T_NUMBER(3)\"]},{\"OP\":[\"T_ADD(+)\"]},{\"EXPR\":[\"T_NUMBER(4)\"]},\"T_PAREN_CLOSE())\"]},\"T_PAREN_CLOSE())\"]},\"T_EOP()\"]}", ast_node_to_json(build_ast(expr_grammar, "((1 + 2) + (3 + 4))")));
     }
 
+    // GRAMMAR NORMALIZER /////////////////////////////////////////////////////
+
+    void test_grammar_normalizer_keeps_correct_grammar_as_is() {
+        test_grammar_normalizer_expect(
+            "A: B | C \nB: T1 | T2 \nC: T3 | T4 \n",
+            "A: B | C \nB: T1 | T2 \nC: T3 | T4 \n");
+    }
+
+    void test_grammar_normalizer_fix_left_recursion() {
+        test_grammar_normalizer_expect(
+            "A: A B | C \nB: T1 | T2 \nC: T3 | T4 ",
+            "A: C A_X | C \nA_X: B A_X | B \nB: T1 | T2 \nC: T3 | T4 \n");
+    }
+
+    void test_grammar_normalizer_sort_rules_to_avoid_premature_match() {
+        test_grammar_normalizer_expect(
+            "A: B | B C \n",
+            "A: B C | B \n");
+    }
+
     // PRIVATES ///////////////////////////////////////////////////////////////
 
    private:
@@ -239,5 +264,16 @@ class Test {
         ostringstream oss;
         oss << *node;
         return oss.str();
+    }
+
+    void test_grammar_normalizer_expect(string original, string expected) {
+        Grammar g(new_grammar_from_string(original));
+
+        GrammarNormalizer gn(&g);
+        gn.normalize();
+        ostringstream normalized;
+        normalized << g;
+
+        ASSERT_EQUAL(expected, normalized.str());
     }
 };
