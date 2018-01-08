@@ -31,12 +31,14 @@ OP: T_ADD | T_SUB
 
 Available terminal tokens are hardcoded for now in https://github.com/itarato/compiler/blob/master/util.cpp#L9 .
 
+More examples in: https://github.com/itarato/compiler/tree/master/sample
+
 # AST builder
 
 There are 2 parsers (and AST builders) in the project:
 
-- bactrack parser (requires context free, non left recursive, premature match free grammar)
-- LL(1) parser
+- bactrack parser (requires context free, non left recursive, premature match free grammar - done by grammar normalizer)
+- LL(1) parser (requires LL(1) grammar)
 
 # Build
 
@@ -48,7 +50,7 @@ make && ./main test
 
 # Usage
 
-- Normalize grammar
+- Normalize grammar:
 
 `./main grammar GRAMMAR_FILE`
 
