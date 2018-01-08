@@ -49,7 +49,7 @@ int mode_parse(int argc, char *argv[]) {
     Tokenizer t(new_tokenizer_from_filename(argv[3]));
     cout << t << endl;
 
-    AstBuilder ab(&g, &t);
+    AstBuilder ab(&g, &t, true);
     AstNode *p_ast_node = ab.build();
 
     if (p_ast_node != nullptr) cout << *p_ast_node << endl;

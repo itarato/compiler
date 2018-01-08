@@ -19,8 +19,9 @@ class AstBuilder {
    public:
     Grammar *grammar;
     Tokenizer *tokenizer;
+    bool verbose_mode;
 
-    AstBuilder(Grammar *, Tokenizer *);
+    AstBuilder(Grammar *, Tokenizer *, bool = false);
     AstNode *build();
 
    private:
