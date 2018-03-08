@@ -31,6 +31,8 @@ AstNode *LLAstBuilder::build() {
          back_inserter(source_tokens));
     vector<string> rule_tokens({START_RULE});
 
+    AstNode *p_ast_node = new AstNode(START_RULE);
+
     while (!rule_tokens.empty() && !source_tokens.empty()) {
         cout << "\x1B[92mR\\\x1B[0m ";
         copy(rule_tokens.rbegin(), rule_tokens.rend(),
@@ -80,7 +82,7 @@ AstNode *LLAstBuilder::build() {
         }
     }
 
-    return nullptr;
+    return p_ast_node;
 }
 
 void LLAstBuilder::build_flat_grammar_version() {

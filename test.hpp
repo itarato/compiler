@@ -13,6 +13,7 @@
 #include "grammar.h"
 #include "tokenizer.h"
 #include "grammar_normalizer.h"
+#include "ll_ast_builder.h"
 
 using namespace std;
 
@@ -41,10 +42,14 @@ class Test {
         test_tokenizer_recognize_multiple_tokens();
 
         test_ast_builder_examples();
+        test_ast_builder_empty();
+        test_ast_builder_same_rule_beginning();
 
         test_grammar_normalizer_keeps_correct_grammar_as_is();
         test_grammar_normalizer_fix_left_recursion();
         test_grammar_normalizer_sort_rules_to_avoid_premature_match();
+
+        test_ll_ast_builder_examples();
 
         cout << endl
              << "\x1B[1mCOMPLETE\x1B[0m - \x1B[92mSUCCESS: " << success_count
@@ -171,19 +176,47 @@ class Test {
     // AST BUILDER TESTS //////////////////////////////////////////////////////
 
     void test_ast_builder_examples() {
-        ASSERT_EQUAL((string) "{\"PROG\":[\"T_NUMBER(123)\",\"T_EOP()\"]}",
-                     ast_node_to_json(build_ast("PROG: T_NUMBER T_EOP", "123")));
+        ASSERT_EQUAL(
+            (string)"{\"PROG\":[\"T_NUMBER(123)\",\"T_EOP()\"]}",
+            ast_node_to_json(build_ast("PROG: T_NUMBER T_EOP", "123"))
+        );
 
         string expr_grammar = "PROG: EXPR T_EOP\nEXPR: T_NUMBER | T_PAREN_OPEN EXPR OP EXPR T_PAREN_CLOSE\nOP: T_ADD";
-        ASSERT_EQUAL((string)"{\"PROG\":[{\"EXPR\":[\"T_NUMBER(1)\"]},\"T_EOP()\"]}", ast_node_to_json(build_ast(expr_grammar, "1")));
+        ASSERT_EQUAL(
+            (string)"{\"PROG\":[{\"EXPR\":[\"T_NUMBER(1)\"]},\"T_EOP()\"]}", 
+            ast_node_to_json(build_ast(expr_grammar, "1"))
+        );
         
-        ASSERT_EQUAL((string)"{\"PROG\":[{\"EXPR\":[\"T_PAREN_OPEN(()\",{\"EXPR\":[\"T_NUMBER(1)\"]},{\"OP\":[\"T_ADD(+)\"]},{\"EXPR\":[\"T_NUMBER(2)\"]},\"T_PAREN_CLOSE())\"]},\"T_EOP()\"]}", ast_node_to_json(build_ast(expr_grammar, "(1 + 2)")));
+        ASSERT_EQUAL(
+            (string)"{\"PROG\":[{\"EXPR\":[\"T_PAREN_OPEN(()\",{\"EXPR\":[\"T_NUMBER(1)\"]},{\"OP\":[\"T_ADD(+)\"]},{\"EXPR\":[\"T_NUMBER(2)\"]},\"T_PAREN_CLOSE())\"]},\"T_EOP()\"]}", 
+            ast_node_to_json(build_ast(expr_grammar, "(1 + 2)"))
+        );
         
-        ASSERT_EQUAL((string)"{\"PROG\":[{\"EXPR\":[\"T_PAREN_OPEN(()\",{\"EXPR\":[\"T_NUMBER(1)\"]},{\"OP\":[\"T_ADD(+)\"]},{\"EXPR\":[\"T_PAREN_OPEN(()\",{\"EXPR\":[\"T_NUMBER(2)\"]},{\"OP\":[\"T_ADD(+)\"]},{\"EXPR\":[\"T_NUMBER(3)\"]},\"T_PAREN_CLOSE())\"]},\"T_PAREN_CLOSE())\"]},\"T_EOP()\"]}", ast_node_to_json(build_ast(expr_grammar, "(1 + (2 + 3))")));
+        ASSERT_EQUAL(
+            (string)"{\"PROG\":[{\"EXPR\":[\"T_PAREN_OPEN(()\",{\"EXPR\":[\"T_NUMBER(1)\"]},{\"OP\":[\"T_ADD(+)\"]},{\"EXPR\":[\"T_PAREN_OPEN(()\",{\"EXPR\":[\"T_NUMBER(2)\"]},{\"OP\":[\"T_ADD(+)\"]},{\"EXPR\":[\"T_NUMBER(3)\"]},\"T_PAREN_CLOSE())\"]},\"T_PAREN_CLOSE())\"]},\"T_EOP()\"]}", 
+            ast_node_to_json(build_ast(expr_grammar, "(1 + (2 + 3))"))
+        );
         
-        ASSERT_EQUAL((string)"{\"PROG\":[{\"EXPR\":[\"T_PAREN_OPEN(()\",{\"EXPR\":[\"T_PAREN_OPEN(()\",{\"EXPR\":[\"T_NUMBER(1)\"]},{\"OP\":[\"T_ADD(+)\"]},{\"EXPR\":[\"T_NUMBER(2)\"]},\"T_PAREN_CLOSE())\"]},{\"OP\":[\"T_ADD(+)\"]},{\"EXPR\":[\"T_NUMBER(3)\"]},\"T_PAREN_CLOSE())\"]},\"T_EOP()\"]}", ast_node_to_json(build_ast(expr_grammar, "((1 + 2) + 3)")));
+        ASSERT_EQUAL(
+            (string)"{\"PROG\":[{\"EXPR\":[\"T_PAREN_OPEN(()\",{\"EXPR\":[\"T_PAREN_OPEN(()\",{\"EXPR\":[\"T_NUMBER(1)\"]},{\"OP\":[\"T_ADD(+)\"]},{\"EXPR\":[\"T_NUMBER(2)\"]},\"T_PAREN_CLOSE())\"]},{\"OP\":[\"T_ADD(+)\"]},{\"EXPR\":[\"T_NUMBER(3)\"]},\"T_PAREN_CLOSE())\"]},\"T_EOP()\"]}", 
+            ast_node_to_json(build_ast(expr_grammar, "((1 + 2) + 3)"))
+        );
         
-        ASSERT_EQUAL((string) "{\"PROG\":[{\"EXPR\":[\"T_PAREN_OPEN(()\",{\"EXPR\":[\"T_PAREN_OPEN(()\",{\"EXPR\":[\"T_NUMBER(1)\"]},{\"OP\":[\"T_ADD(+)\"]},{\"EXPR\":[\"T_NUMBER(2)\"]},\"T_PAREN_CLOSE())\"]},{\"OP\":[\"T_ADD(+)\"]},{\"EXPR\":[\"T_PAREN_OPEN(()\",{\"EXPR\":[\"T_NUMBER(3)\"]},{\"OP\":[\"T_ADD(+)\"]},{\"EXPR\":[\"T_NUMBER(4)\"]},\"T_PAREN_CLOSE())\"]},\"T_PAREN_CLOSE())\"]},\"T_EOP()\"]}", ast_node_to_json(build_ast(expr_grammar, "((1 + 2) + (3 + 4))")));
+        ASSERT_EQUAL(
+            (string)"{\"PROG\":[{\"EXPR\":[\"T_PAREN_OPEN(()\",{\"EXPR\":[\"T_PAREN_OPEN(()\",{\"EXPR\":[\"T_NUMBER(1)\"]},{\"OP\":[\"T_ADD(+)\"]},{\"EXPR\":[\"T_NUMBER(2)\"]},\"T_PAREN_CLOSE())\"]},{\"OP\":[\"T_ADD(+)\"]},{\"EXPR\":[\"T_PAREN_OPEN(()\",{\"EXPR\":[\"T_NUMBER(3)\"]},{\"OP\":[\"T_ADD(+)\"]},{\"EXPR\":[\"T_NUMBER(4)\"]},\"T_PAREN_CLOSE())\"]},\"T_PAREN_CLOSE())\"]},\"T_EOP()\"]}", 
+            ast_node_to_json(build_ast(expr_grammar, "((1 + 2) + (3 + 4))"))
+        );
+    }
+
+    void test_ast_builder_empty() {
+        ASSERT_EQUAL((string)"{\"PROG\":[{\"EXPR\":[]},\"T_EOP()\"]}", ast_node_to_json(build_ast("PROG: EXPR T_EOP\nEXPR: T_NUMBER |", "")));
+    }
+
+    void test_ast_builder_same_rule_beginning() {
+        ASSERT_EQUAL(
+            (string)"{\"PROG\":[{\"A\":[{\"B\":[\"T_ADD(+)\"]},\"T_NUMBER(12)\"]},\"T_EOP()\"]}",
+            ast_node_to_json(build_ast("PROG: A T_EOP\nA: B T_NUMBER | B T_STRING\nB: T_ADD | T_SUB", "+ 12"))
+        );
     }
 
     // GRAMMAR NORMALIZER /////////////////////////////////////////////////////
@@ -204,6 +237,15 @@ class Test {
         test_grammar_normalizer_expect(
             "A: B | B C \n",
             "A: B C | B \n");
+    }
+
+    // LL PARSER //////////////////////////////////////////////////////////////
+
+    void test_ll_ast_builder_examples() {
+        ASSERT_EQUAL(
+            (string)"{\"PROG\":[\"T_NUMBER(123)\",\"T_EOP()\"]}",
+            ast_node_to_json(build_ll_ast("PROG: T_NUMBER T_EOP", "123"))
+        );
     }
 
     // PRIVATES ///////////////////////////////////////////////////////////////
@@ -257,6 +299,20 @@ class Test {
         Tokenizer *pt = new Tokenizer(source_isit);
 
         AstBuilder a(pg, pt);
+        return a.build();
+    }
+
+    AstNode *build_ll_ast(string raw_grammar, string raw_source) {
+        istringstream grammar_iss(raw_grammar);
+        istream_iterator<string> grammar_isit(grammar_iss);
+        Grammar *pg = new Grammar(grammar_isit);
+
+        istringstream source_iss(raw_source);
+        source_iss >> noskipws;
+        istream_iterator<char> source_isit(source_iss);
+        Tokenizer *pt = new Tokenizer(source_isit);
+
+        LLAstBuilder a(pg, pt);
         return a.build();
     }
 

@@ -70,7 +70,11 @@ int mode_llparse(int argc, char *argv[]) {
     cout << t << endl;
 
     LLAstBuilder llab(&g, &t);
-    llab.build();
+    AstNode *p_ast_node = llab.build();
+
+    if (p_ast_node != nullptr) cout << *p_ast_node << endl;
+    else cout << "NO\n";
+
     return EXIT_SUCCESS;
 }
 
@@ -101,5 +105,7 @@ int mode_test() {
 void print_help() {
     cout << "Invocation error.\n";
     cout << "Usage for parsing: ./main parse GRAMMAR SOURCE\n";
+    cout << "Usage for LL1-language parsing: ./main llparse GRAMMAR SOURCE";
     cout << "Usage for grammar correction: ./main grammar GRAMMAR\n";
+    cout << "Usage for testing: ./main test\n";
 }
