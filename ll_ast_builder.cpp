@@ -3,9 +3,10 @@
 #include <iterator>
 #include <map>
 #include <set>
-
+#include <utility>
 #include "ast_node.h"
 #include "ll_ast_builder.h"
+
 #include "token.h"
 #include "util.h"
 
@@ -31,7 +32,8 @@ AstNode *LLAstBuilder::build() {
          back_inserter(source_tokens));
     vector<string> rule_tokens({START_RULE});
 
-    AstNode *p_ast_node = new AstNode(START_RULE);
+    AstNode *p_last_ast_node = nullptr;
+    vector<pair<AstNode *, uint>> node_stack({});
 
     while (!rule_tokens.empty() && !source_tokens.empty()) {
         cout << "\x1B[92mR\\\x1B[0m ";
@@ -43,13 +45,25 @@ AstNode *LLAstBuilder::build() {
             cout << token_e_to_s(it->type) << " ";
         cout << endl << endl;
 
+        // If both stack top has the same deterministic token - reduce.
         if (token_eq(rule_tokens.back(), source_tokens.back().type)) {
             cout << "Match - deterministic tokens: " << rule_tokens.back()
                  << endl
                  << endl;
 
+            node_stack.back().first->parts.push_back(new_ast_node_part_token(source_tokens.back()));
+
             rule_tokens.pop_back();
             source_tokens.pop_back();
+
+            while (node_stack.size() > 0 && rule_tokens.size() == node_stack.back().second) {
+              p_last_ast_node = node_stack.back().first;
+              node_stack.pop_back();
+
+              if (node_stack.size() > 0) {
+                node_stack.back().first->parts.push_back(new_ast_node_part_node(p_last_ast_node));
+              }
+            }
         } else {
             // If rule is deterministic and not matching (prev cond).
             if (is_token(rule_tokens.back())) {
@@ -57,14 +71,15 @@ AstNode *LLAstBuilder::build() {
                 exit(EXIT_FAILURE);
             }
 
-            // From the current first rule the deterministic source token is
-            // unreachable.
             string source_token_string =
                 token_e_to_s(source_tokens.back().type);
             if (rule_lookup[rule_tokens.back()].find(source_token_string) ==
                 rule_lookup[rule_tokens.back()].end()) {
+                // Test for an empty rule and correct the source token if so.
                 if (rule_lookup[rule_tokens.back()].find(T_EMPTY) ==
                     rule_lookup[rule_tokens.back()].end()) {
+                    // From the current first rule the deterministic source token is
+                    // unreachable.
                     cout << "No matching rule.\n";
                     exit(EXIT_FAILURE);
                 }
@@ -75,6 +90,10 @@ AstNode *LLAstBuilder::build() {
                 rule_lookup[rule_tokens.back()][source_token_string];
             cout << "Expand rule: #" << rule_idx << endl << endl;
 
+            // If rule is obvious - expand.
+            node_stack.push_back({new AstNode(rule_tokens.back()), rule_tokens.size() - 1});
+            cout << "Added " << rule_tokens.back() << " to node stack with marker: " << (rule_tokens.size() - 1) << endl;
+
             rule_tokens.pop_back();
             copy(flat_grammar[rule_idx].rule.parts.rbegin(),
                  flat_grammar[rule_idx].rule.parts.rend(),
@@ -82,7 +101,7 @@ AstNode *LLAstBuilder::build() {
         }
     }
 
-    return p_ast_node;
+    return p_last_ast_node;
 }
 
 void LLAstBuilder::build_flat_grammar_version() {
