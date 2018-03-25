@@ -10,6 +10,8 @@
 #include "token.h"
 #include "util.h"
 
+using namespace std;
+
 void print_flat_grammar_rules(vector<FlatGrammarRule> fgr) {
     cout << "Grammar / decision list:\n";
     unsigned int idx = 0;
