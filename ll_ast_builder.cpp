@@ -75,11 +75,11 @@ AstNode *LLAstBuilder::build() {
 
             string source_token_string =
                 token_e_to_s(source_tokens.back().type);
-            if (rule_lookup[rule_tokens.back()].find(source_token_string) ==
-                rule_lookup[rule_tokens.back()].end()) {
+            int lookup_match = lookup(rule_tokens.back(), {source_token_string});
+            if (lookup_match == -1) {
                 // Test for an empty rule and correct the source token if so.
-                if (rule_lookup[rule_tokens.back()].find(T_EMPTY) ==
-                    rule_lookup[rule_tokens.back()].end()) {
+                lookup_match = lookup(rule_tokens.back(), {T_EMPTY});
+                if (lookup_match == -1) {
                     // From the current first rule the deterministic source token is
                     // unreachable.
                     cout << "No matching rule.\n";
@@ -88,17 +88,15 @@ AstNode *LLAstBuilder::build() {
                 source_token_string = T_EMPTY;
             }
 
-            unsigned int rule_idx =
-                rule_lookup[rule_tokens.back()][source_token_string];
-            cout << "Expand rule: #" << rule_idx << endl << endl;
+            cout << "Expand rule: #" << lookup_match << endl << endl;
 
             // If rule is obvious - expand.
             node_stack.push_back({new AstNode(rule_tokens.back()), rule_tokens.size() - 1});
             cout << "Added " << rule_tokens.back() << " to node stack with marker: " << (rule_tokens.size() - 1) << endl;
 
             rule_tokens.pop_back();
-            copy(flat_grammar[rule_idx].rule.parts.rbegin(),
-                 flat_grammar[rule_idx].rule.parts.rend(),
+            copy(flat_grammar[lookup_match].rule.parts.rbegin(),
+                 flat_grammar[lookup_match].rule.parts.rend(),
                  back_inserter(rule_tokens));
         }
     }
@@ -112,23 +110,24 @@ void LLAstBuilder::build_flat_grammar_version() {
         string rule_name(line_pair.first);
         for (auto &rule : line_pair.second.rules) {
             flat_grammar.push_back({rule_name, rule});
-            vector<string> reached_tokens = find_starting_tokens(rule);
-            for (auto &reached_token : reached_tokens) {
+            vector<vector<string>> reached_tokens_list = find_starting_tokens(rule);
+            for (auto &reached_tokens : reached_tokens_list) {
                 // Validate grammar - LL1 is not that strong - easy to have
                 // multiple nonterminals for terminals.
-                if (rule_lookup.find(rule_name) != rule_lookup.end() &&
-                    rule_lookup[rule_name].find(reached_token) !=
-                        rule_lookup[rule_name].end()) {
+
+                int lookup_match = lookup(rule_name, reached_tokens);
+                if (lookup_match >= 0) {
                     cout << "Invalid grammar - terminal token can be reached "
                             "from multiple non terminal.\n";
-                    cout << "Collision: " << rule_name << " - " << reached_token
-                         << " : " << rule_lookup[rule_name][reached_token]
+                    cout << "Collision: " << rule_name << " - ( ";
+                    copy(reached_tokens.begin(), reached_tokens.end(), ostream_iterator<string>(cout, " "));
+                    cout << ") : " << lookup_match
                          << " vs " << idx << " in\n";
                     print_flat_grammar_rules(flat_grammar);
                     exit(EXIT_FAILURE);
                 }
 
-                rule_lookup[rule_name][reached_token] = idx;
+                rule_lookup[rule_name][(unsigned int)idx] = reached_tokens;
             }
 
             idx++;
@@ -138,29 +137,42 @@ void LLAstBuilder::build_flat_grammar_version() {
     print_rule_lookup();
 }
 
-void LLAstBuilder::print_rule_lookup() {
-    cout << "Rule lookup matrix:\n";
+vector<vector<string>> LLAstBuilder::find_starting_tokens(GrammarRule rule) {
+    if (rule.parts.size() == 0) return {{T_EMPTY}};
 
-    for (auto &rule_lookup_pair : rule_lookup) {
-        for (auto &token_pair : rule_lookup_pair.second) {
-            cout << "[" << rule_lookup_pair.first << ", " << token_pair.first
-                 << "] -> " << token_pair.second << endl;
-        }
-    }
-}
-
-vector<string> LLAstBuilder::find_starting_tokens(GrammarRule rule) {
-    if (rule.parts.size() == 0) return {T_EMPTY};
-
-    vector<string> out;
+    vector<vector<string>> out;
     if (is_token(rule.parts[0])) {
-        out.push_back(rule.parts[0]);
+        out.push_back({rule.parts[0]});
     } else {
-        for (auto &rule : grammar->lines[rule.parts[0]].rules) {
-            auto sub_out = find_starting_tokens(rule);
+        for (auto &_rule : grammar->lines[rule.parts[0]].rules) {
+            auto sub_out = find_starting_tokens(_rule);
             copy(sub_out.begin(), sub_out.end(), back_inserter(out));
         }
     }
 
     return out;
+}
+
+int LLAstBuilder::lookup(string rule_name, vector<string> tokens) {
+  if (rule_lookup.find(rule_name) == rule_lookup.end()) return -1;
+
+  for (auto tokens_pair : rule_lookup[rule_name]) {
+    if (equal(tokens_pair.second.begin(), tokens_pair.second.end(), tokens.begin())) {
+      return tokens_pair.first;
+    }
+  }
+
+  return -1;
+}
+
+void LLAstBuilder::print_rule_lookup() {
+    cout << "Rule lookup matrix:\n";
+
+    for (auto &rule_lookup_pair : rule_lookup) {
+        for (auto &tokens_pair : rule_lookup_pair.second) {
+            cout << "[" << rule_lookup_pair.first << ", ( ";
+            copy(tokens_pair.second.begin(), tokens_pair.second.end(), ostream_iterator<string>(cout, " "));
+            cout << ")] -> " << tokens_pair.first << endl;
+        }
+    }
 }

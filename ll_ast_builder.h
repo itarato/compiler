@@ -16,6 +16,7 @@ struct FlatGrammarRule {
     string rule_name;
     GrammarRule rule;
 };
+
 void print_flat_grammar_rules(vector<FlatGrammarRule>);
 
 class LLAstBuilder {
@@ -23,13 +24,14 @@ class LLAstBuilder {
     Grammar *grammar;
     Tokenizer *tokenizer;
     vector<FlatGrammarRule> flat_grammar;
-    map<string, map<string, unsigned int>> rule_lookup;
+    map<string, map<unsigned int, vector<string>>> rule_lookup;
 
     LLAstBuilder(Grammar *, Tokenizer *);
     AstNode *build();
 
    private:
     void build_flat_grammar_version();
-    vector<string> find_starting_tokens(GrammarRule);
+    vector<vector<string>> find_starting_tokens(GrammarRule);
     void print_rule_lookup();
+    int lookup(string, vector<string>);
 };
