@@ -21,8 +21,8 @@ void print_flat_grammar_rules(vector<FlatGrammarRule> fgr) {
   }
 }
 
-LLAstBuilder::LLAstBuilder(Grammar *g, Tokenizer *t)
-    : grammar(g), tokenizer(t) {
+LLAstBuilder::LLAstBuilder(Grammar *g, Tokenizer *t, unsigned int ll_level)
+    : grammar(g), tokenizer(t), ll_level(ll_level) {
   build_flat_grammar_version();
 };
 

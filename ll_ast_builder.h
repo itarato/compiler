@@ -23,10 +23,11 @@ class LLAstBuilder {
    public:
     Grammar *grammar;
     Tokenizer *tokenizer;
+    unsigned int ll_level;
     vector<FlatGrammarRule> flat_grammar;
     map<string, map<unsigned int, vector<vector<string>>>> rule_lookup;
 
-    LLAstBuilder(Grammar *, Tokenizer *);
+    LLAstBuilder(Grammar *, Tokenizer *, unsigned int = 1);
     AstNode *build();
 
    private:

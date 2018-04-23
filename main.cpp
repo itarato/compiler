@@ -58,7 +58,7 @@ int mode_parse(int argc, char *argv[]) {
 }
 
 int mode_llparse(int argc, char *argv[]) {
-    if (argc != 4) {
+    if (argc != 5) {
         print_help();
         return EXIT_FAILURE;
     }
@@ -69,7 +69,10 @@ int mode_llparse(int argc, char *argv[]) {
     Tokenizer t(new_tokenizer_from_filename(argv[3]));
     cout << t << endl;
 
-    LLAstBuilder llab(&g, &t);
+    unsigned int ll_level = (unsigned int)stoi(argv[4]);
+    cout << "Lookahead level: " << ll_level << endl;
+
+    LLAstBuilder llab(&g, &t, ll_level);
     AstNode *p_ast_node = llab.build();
 
     if (p_ast_node != nullptr) cout << *p_ast_node << endl;
