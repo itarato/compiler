@@ -114,7 +114,7 @@ void LLAstBuilder::build_flat_grammar_version() {
     string rule_name(line_pair.first);
     for (auto &rule : line_pair.second.rules) {
       flat_grammar.push_back({rule_name, rule});
-      vector<vector<string>> reached_tokens_list = find_starting_tokens(rule);
+      vector<vector<string>> reached_tokens_list = find_starting_tokens(rule, ll_level);
       for (auto &reached_tokens : reached_tokens_list) {
         // Validate grammar - LL1 is not that strong - easy to have
         // multiple nonterminals for terminals.
@@ -141,20 +141,48 @@ void LLAstBuilder::build_flat_grammar_version() {
   print_rule_lookup();
 }
 
-vector<vector<string>> LLAstBuilder::find_starting_tokens(GrammarRule rule) {
-  if (rule.parts.size() == 0) return {{T_EMPTY}};
 
-  vector<vector<string>> out;
-  if (is_token(rule.parts[0])) {
-    out.push_back({rule.parts[0]});
-  } else {
-    for (auto &_rule : grammar->lines[rule.parts[0]].rules) {
-      auto sub_out = find_starting_tokens(_rule);
-      copy(sub_out.begin(), sub_out.end(), back_inserter(out));
+
+vector<vector<string>> LLAstBuilder::find_starting_tokens(string rule_name, unsigned int idx, int limit) {
+  vector<vector<string>> parts({{}});
+
+  for (auto & _part : grammar->lines[rule_name].rules[idx].parts) {
+    if (parts.size() > 0 && any_of(parts.begin(), parts.end(), [&limit](auto p){ return p.size() < limit; })) {
+      continue;
+    }
+
+    if (is_token(_part)) {
+      transform(parts.begin(), parts.end(), parts.begin(), [&limit, &_part](auto p){
+        if (p.size() >= limit) {
+          return p;
+        } else {
+          p.push_back(_part);
+          return p;
+        }
+      });
+    } else {
+      vector<vector<string>> new_parts({{}});
+
+      for (auto it = grammar->lines[_part].rules.begin(); it != grammar->lines[_part].rules.end(); it++) {
+        unsigned int _idx = it - grammar->lines[_part].rules.begin();
+        auto min_elem_it = min_element(parts.begin(), parts.end(), [](auto a, auto b){ return true; });
+        unsigned int min_size = min_elem_it->size();
+        vector<vector<string>> reachables = find_starting_tokens(_part, _idx, limit - min_size);
+
+        for (auto & _reachable : reachables) {
+          for (auto & __part : parts) {
+            vector<string> merged = __part;
+            copy(_reachable.begin(), _reachable.end(), back_inserter(merged));
+            new_parts.push_back(merged);
+          }
+        }
+      }
+
+      parts = new_parts;
     }
   }
 
-  return out;
+  return parts;
 }
 
 int LLAstBuilder::lookup(string rule_name, vector<string> tokens) {
