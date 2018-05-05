@@ -102,7 +102,7 @@ void LLAstBuilder::build_lookup_table() {
     for (auto rule_it = grammar_line_pair.second.rules.begin(); rule_it != grammar_line_pair.second.rules.end(); rule_it++) {
       unsigned int idx = rule_it - grammar_line_pair.second.rules.begin();
 
-      rule_lookup[{grammar_line_pair.first, idx}] = find_starting_tokens(grammar_line_pair.first, idx, 2);
+      rule_lookup[{grammar_line_pair.first, idx}] = find_starting_tokens(grammar_line_pair.first, idx, ll_level);
     }
   }
 
@@ -153,15 +153,30 @@ vector<vector<string>> LLAstBuilder::find_starting_tokens(string rule_name, unsi
 }
 
 int LLAstBuilder::lookup(string rule_name, vector<string> tokens) {
-  // if (rule_lookup.find(rule_name) == rule_lookup.end()) return -1;
+  for (auto it = grammar->lines[rule_name].rules.begin(); it != grammar->lines[rule_name].rules.end(); it++) {
+    unsigned int idx = it - grammar->lines[rule_name].rules.begin();
+    vector<vector<string>> &lookup = rule_lookup[{rule_name, idx}];
+    for (auto lookup_it = lookup.begin(); lookup_it != lookup.end(); lookup_it++) {
+      unsigned int len = min(tokens.size(), lookup_it->size());
 
-  // for (auto tokens_pair : rule_lookup[rule_name]) {
-  //   for (auto lookup_tokens : tokens_pair.second) {
-  //     if (equal(lookup_tokens.begin(), lookup_tokens.end(), tokens.begin())) {
-  //       return tokens_pair.first;
-  //     }
-  //   }
-  // }
+      if (len == 0) {
+        cout << "LEN is zero!" << endl;
+        exit(EXIT_FAILURE);
+      }
+
+      bool is_match = true;
+      for (int i = 0; i < len; i++) {
+        if ((*lookup_it)[i] != tokens[i]) {
+          is_match = false;
+          break;
+        }
+      }
+
+      if (is_match) {
+        return idx;
+      }
+    }
+  }
 
   return -1;
 }
