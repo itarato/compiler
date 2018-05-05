@@ -118,6 +118,7 @@ void LLAstBuilder::build_lookup_table() {
   if (verbose_mode) print_rule_lookup();
 }
 
+// @TODO Add lookup row uniqueness check!
 vector<vector<string>> LLAstBuilder::find_starting_tokens(string rule_name, unsigned int idx, int limit) {
   vector<vector<string>> parts({{}});
 
@@ -154,6 +155,7 @@ vector<vector<string>> LLAstBuilder::find_starting_tokens(string rule_name, unsi
         }
       }
 
+      // @TODO Only assign unique sequences.
       parts = new_parts;
     }
   }

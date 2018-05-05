@@ -72,7 +72,7 @@ int mode_llparse(int argc, char *argv[]) {
     unsigned int ll_level = (unsigned int)stoi(argv[4]);
     cout << "Lookahead level: " << ll_level << endl;
 
-    LLAstBuilder llab(&g, &t, ll_level);
+    LLAstBuilder llab(&g, &t, ll_level, true);
     AstNode *p_ast_node = llab.build();
     
     if (p_ast_node != nullptr) cout << *p_ast_node << endl;
