@@ -19,8 +19,9 @@ public:
   Tokenizer *tokenizer;
   unsigned int ll_level;
   map<pair<string, unsigned int>, vector<vector<string>>> rule_lookup;
+  bool verbose_mode;
 
-  LLAstBuilder(Grammar *, Tokenizer *, unsigned int = 1);
+  LLAstBuilder(Grammar *, Tokenizer *, unsigned int = 1, bool = false);
   AstNode *build();
 
 private:
