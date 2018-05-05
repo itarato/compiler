@@ -12,9 +12,24 @@
 
 using namespace std;
 
-LLAstBuilder::LLAstBuilder(Grammar *g, Tokenizer *t, unsigned int ll_level, bool _verbose_mode)
-    : grammar(g), tokenizer(t), ll_level(ll_level), verbose_mode(_verbose_mode) {
-  build_lookup_table();
+LLAstBuilder::LLAstBuilder(Grammar *g, Tokenizer *t, unsigned int ll_max_level, bool _verbose_mode)
+    : grammar(g), tokenizer(t), ll_max_level(ll_max_level), verbose_mode(_verbose_mode) {
+
+  bool found_valid_lookup_table = false;
+  for (unsigned int ll_level = 1; ll_level <= ll_max_level; ll_level++) {
+    cout << "Looking for LL(" << ll_level << ") lookup table.\n";
+
+    build_lookup_table(ll_level);
+    if (is_lookup_table_valid()) {
+      found_valid_lookup_table = true;
+      break;
+    }
+  }
+
+  if (!found_valid_lookup_table) {
+    cout << "Error. No possible LL(" << ll_max_level << ") parser.\n";
+    exit(EXIT_FAILURE);
+  }
 };
 
 AstNode *LLAstBuilder::build() {
@@ -106,7 +121,7 @@ AstNode *LLAstBuilder::build() {
   return p_last_ast_node;
 }
 
-void LLAstBuilder::build_lookup_table() {
+void LLAstBuilder::build_lookup_table(unsigned int ll_level) {
   for (auto & grammar_line_pair : grammar->lines) {
     for (auto rule_it = grammar_line_pair.second.rules.begin(); rule_it != grammar_line_pair.second.rules.end(); rule_it++) {
       unsigned int idx = rule_it - grammar_line_pair.second.rules.begin();
@@ -140,7 +155,7 @@ vector<vector<string>> LLAstBuilder::find_starting_tokens(string rule_name, unsi
       for (auto it = grammar->lines[_part].rules.begin(); it != grammar->lines[_part].rules.end(); it++) {
         unsigned int _idx = it - grammar->lines[_part].rules.begin();
         unsigned int min_size = 0;
-        if (new_parts.size() > 0) {
+        if (parts.size() > 0) {
           auto min_elem_it = min_element(parts.begin(), parts.end(), [](auto a, auto b){ return a.size() < b.size(); });
           min_size = min_elem_it->size();
         }
@@ -155,8 +170,9 @@ vector<vector<string>> LLAstBuilder::find_starting_tokens(string rule_name, unsi
         }
       }
 
-      // @TODO Only assign unique sequences.
-      parts = new_parts;
+      parts.clear();
+      sort(new_parts.begin(), new_parts.end());
+      unique_copy(new_parts.begin(), new_parts.end(), back_inserter(parts));
     }
   }
 
@@ -202,4 +218,32 @@ void LLAstBuilder::print_rule_lookup() {
       cout << endl;
     }
   }
+}
+
+bool LLAstBuilder::is_lookup_table_valid() {
+  for (auto lhs_group_kv : rule_lookup) {
+    for (auto lhs_list : lhs_group_kv.second) {
+
+      for (int i = 0; i < grammar->lines[lhs_group_kv.first.first].rules.size(); i++) {
+        // Same group - skip it.
+        if (i == lhs_group_kv.first.second) continue;
+
+        for (auto & rhs_list : rule_lookup[{lhs_group_kv.first.first, i}]) {
+          if (lhs_list == rhs_list) {
+            cout << "Collision in rules: ";
+            cout << lhs_group_kv.first.first << " #" << lhs_group_kv.first.second << " and #" << i << endl;
+
+            copy(lhs_list.begin(), lhs_list.end(), ostream_iterator<string>(cout, " "));
+            cout << endl;
+            copy(rhs_list.begin(), rhs_list.end(), ostream_iterator<string>(cout, " "));
+            cout << endl;
+
+            return false;
+          }
+        }
+      }
+    }
+  }
+
+  return true;
 }

@@ -17,7 +17,7 @@ class LLAstBuilder {
 public:
   Grammar *grammar;
   Tokenizer *tokenizer;
-  unsigned int ll_level;
+  unsigned int ll_max_level;
   map<pair<string, unsigned int>, vector<vector<string>>> rule_lookup;
   bool verbose_mode;
 
@@ -25,8 +25,9 @@ public:
   AstNode *build();
 
 private:
-  void build_lookup_table();
+  void build_lookup_table(unsigned int);
   vector<vector<string>> find_starting_tokens(string, unsigned int, int);
   void print_rule_lookup();
   int lookup(string, vector<string>);
+  bool is_lookup_table_valid();
 };
