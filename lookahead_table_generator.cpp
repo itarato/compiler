@@ -111,13 +111,14 @@ bool LookaheadTableGenerator::is_lookup_table_valid() {
 
         for (auto & rhs_list : rule_lookup[{lhs_group_kv.first.first, i}]) {
           if (lhs_list == rhs_list) {
-            cout << "Collision in rules: ";
-            cout << lhs_group_kv.first.first << " #" << lhs_group_kv.first.second << " and #" << i << endl;
-
-            copy(lhs_list.begin(), lhs_list.end(), ostream_iterator<string>(cout, " "));
-            cout << endl;
-            copy(rhs_list.begin(), rhs_list.end(), ostream_iterator<string>(cout, " "));
-            cout << endl;
+            if (verbose_mode) {
+              cout << "Collision in rules: ";
+              cout << lhs_group_kv.first.first << " #" << lhs_group_kv.first.second << " and #" << i << endl;
+              copy(lhs_list.begin(), lhs_list.end(), ostream_iterator<string>(cout, " "));
+              cout << endl;
+              copy(rhs_list.begin(), rhs_list.end(), ostream_iterator<string>(cout, " "));
+              cout << endl;
+            }
 
             return false;
           }
