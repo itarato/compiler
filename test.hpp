@@ -183,27 +183,27 @@ class Test {
 
         string expr_grammar = "PROG: EXPR T_EOP\nEXPR: T_NUMBER | T_PAREN_OPEN EXPR OP EXPR T_PAREN_CLOSE\nOP: T_ADD";
         ASSERT_EQUAL(
-            (string)"{\"PROG\":[{\"EXPR\":[\"T_NUMBER(1)\"]},\"T_EOP()\"]}", 
+            (string)"{\"PROG\":[{\"EXPR\":[\"T_NUMBER(1)\"]},\"T_EOP()\"]}",
             ast_node_to_json(build_ast(expr_grammar, "1"))
         );
-        
+
         ASSERT_EQUAL(
-            (string)"{\"PROG\":[{\"EXPR\":[\"T_PAREN_OPEN(()\",{\"EXPR\":[\"T_NUMBER(1)\"]},{\"OP\":[\"T_ADD(+)\"]},{\"EXPR\":[\"T_NUMBER(2)\"]},\"T_PAREN_CLOSE())\"]},\"T_EOP()\"]}", 
+            (string)"{\"PROG\":[{\"EXPR\":[\"T_PAREN_OPEN(()\",{\"EXPR\":[\"T_NUMBER(1)\"]},{\"OP\":[\"T_ADD(+)\"]},{\"EXPR\":[\"T_NUMBER(2)\"]},\"T_PAREN_CLOSE())\"]},\"T_EOP()\"]}",
             ast_node_to_json(build_ast(expr_grammar, "(1 + 2)"))
         );
-        
+
         ASSERT_EQUAL(
-            (string)"{\"PROG\":[{\"EXPR\":[\"T_PAREN_OPEN(()\",{\"EXPR\":[\"T_NUMBER(1)\"]},{\"OP\":[\"T_ADD(+)\"]},{\"EXPR\":[\"T_PAREN_OPEN(()\",{\"EXPR\":[\"T_NUMBER(2)\"]},{\"OP\":[\"T_ADD(+)\"]},{\"EXPR\":[\"T_NUMBER(3)\"]},\"T_PAREN_CLOSE())\"]},\"T_PAREN_CLOSE())\"]},\"T_EOP()\"]}", 
+            (string)"{\"PROG\":[{\"EXPR\":[\"T_PAREN_OPEN(()\",{\"EXPR\":[\"T_NUMBER(1)\"]},{\"OP\":[\"T_ADD(+)\"]},{\"EXPR\":[\"T_PAREN_OPEN(()\",{\"EXPR\":[\"T_NUMBER(2)\"]},{\"OP\":[\"T_ADD(+)\"]},{\"EXPR\":[\"T_NUMBER(3)\"]},\"T_PAREN_CLOSE())\"]},\"T_PAREN_CLOSE())\"]},\"T_EOP()\"]}",
             ast_node_to_json(build_ast(expr_grammar, "(1 + (2 + 3))"))
         );
-        
+
         ASSERT_EQUAL(
-            (string)"{\"PROG\":[{\"EXPR\":[\"T_PAREN_OPEN(()\",{\"EXPR\":[\"T_PAREN_OPEN(()\",{\"EXPR\":[\"T_NUMBER(1)\"]},{\"OP\":[\"T_ADD(+)\"]},{\"EXPR\":[\"T_NUMBER(2)\"]},\"T_PAREN_CLOSE())\"]},{\"OP\":[\"T_ADD(+)\"]},{\"EXPR\":[\"T_NUMBER(3)\"]},\"T_PAREN_CLOSE())\"]},\"T_EOP()\"]}", 
+            (string)"{\"PROG\":[{\"EXPR\":[\"T_PAREN_OPEN(()\",{\"EXPR\":[\"T_PAREN_OPEN(()\",{\"EXPR\":[\"T_NUMBER(1)\"]},{\"OP\":[\"T_ADD(+)\"]},{\"EXPR\":[\"T_NUMBER(2)\"]},\"T_PAREN_CLOSE())\"]},{\"OP\":[\"T_ADD(+)\"]},{\"EXPR\":[\"T_NUMBER(3)\"]},\"T_PAREN_CLOSE())\"]},\"T_EOP()\"]}",
             ast_node_to_json(build_ast(expr_grammar, "((1 + 2) + 3)"))
         );
-        
+
         ASSERT_EQUAL(
-            (string)"{\"PROG\":[{\"EXPR\":[\"T_PAREN_OPEN(()\",{\"EXPR\":[\"T_PAREN_OPEN(()\",{\"EXPR\":[\"T_NUMBER(1)\"]},{\"OP\":[\"T_ADD(+)\"]},{\"EXPR\":[\"T_NUMBER(2)\"]},\"T_PAREN_CLOSE())\"]},{\"OP\":[\"T_ADD(+)\"]},{\"EXPR\":[\"T_PAREN_OPEN(()\",{\"EXPR\":[\"T_NUMBER(3)\"]},{\"OP\":[\"T_ADD(+)\"]},{\"EXPR\":[\"T_NUMBER(4)\"]},\"T_PAREN_CLOSE())\"]},\"T_PAREN_CLOSE())\"]},\"T_EOP()\"]}", 
+            (string)"{\"PROG\":[{\"EXPR\":[\"T_PAREN_OPEN(()\",{\"EXPR\":[\"T_PAREN_OPEN(()\",{\"EXPR\":[\"T_NUMBER(1)\"]},{\"OP\":[\"T_ADD(+)\"]},{\"EXPR\":[\"T_NUMBER(2)\"]},\"T_PAREN_CLOSE())\"]},{\"OP\":[\"T_ADD(+)\"]},{\"EXPR\":[\"T_PAREN_OPEN(()\",{\"EXPR\":[\"T_NUMBER(3)\"]},{\"OP\":[\"T_ADD(+)\"]},{\"EXPR\":[\"T_NUMBER(4)\"]},\"T_PAREN_CLOSE())\"]},\"T_PAREN_CLOSE())\"]},\"T_EOP()\"]}",
             ast_node_to_json(build_ast(expr_grammar, "((1 + 2) + (3 + 4))"))
         );
     }
@@ -247,6 +247,8 @@ class Test {
             ast_node_to_json(build_ll_ast("PROG: T_NUMBER T_EOP", "123"))
         );
     }
+
+    // void test_ll_ast_builder
 
     // PRIVATES ///////////////////////////////////////////////////////////////
 

@@ -25,9 +25,5 @@ public:
   AstNode *build();
 
 private:
-  void build_lookup_table(unsigned int);
-  vector<vector<string>> find_starting_tokens(string, unsigned int, int);
-  void print_rule_lookup();
   int lookup(string, vector<string>);
-  bool is_lookup_table_valid();
 };
