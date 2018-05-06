@@ -38,7 +38,9 @@ More examples in: https://github.com/itarato/compiler/tree/master/sample
 There are 2 parsers (and AST builders) in the project:
 
 - bactrack parser (requires context free, non left recursive, premature match free grammar - done by grammar normalizer)
-- LL(1) parser (requires LL(1) grammar)
+- LL(N) parser (requires LL(N) grammar)
+
+The LL(N) parser accepts a maximum N when generating the lookahead table. If the given grammar cannot generate LL(I) | I <= N than it fails.
 
 # Build
 
@@ -58,9 +60,9 @@ make && ./main test
 
 `./main parse GRAMMAR_FILE SOURCE_FILE`
 
-- Use LL(1) parser:
+- Use LL(N) parser:
 
-`./main llparse GRAMMAR_FILE SOURCE_FILE`
+`./main llparse GRAMMAR_FILE SOURCE_FILE LOOKAHEAD_MAXIMUM`
 
 - Run tests:
 
