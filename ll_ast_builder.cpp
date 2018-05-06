@@ -17,7 +17,7 @@ LLAstBuilder::LLAstBuilder(Grammar *g, Tokenizer *t, unsigned int ll_max_level, 
 
   bool found_valid_lookup_table = false;
   for (unsigned int ll_level = 1; ll_level <= ll_max_level; ll_level++) {
-    cout << "Looking for LL(" << ll_level << ") lookup table.\n";
+    if (verbose_mode) cout << "Looking for LL(" << ll_level << ") lookup table.\n";
 
     build_lookup_table(ll_level);
     if (is_lookup_table_valid()) {
@@ -87,15 +87,15 @@ AstNode *LLAstBuilder::build() {
       string rule_name = rule_tokens.back();
       int lookup_match = lookup(rule_name, {source_token_string});
       if (lookup_match == -1) {
-  //       // Test for an empty rule and correct the source token if so.
-  //       lookup_match = lookup(rule_tokens.back(), {T_EMPTY});
-  //       if (lookup_match == -1) {
-  //         // From the current first rule the deterministic source token is
-  //         // unreachable.
+        // Test for an empty rule and correct the source token if so.
+        lookup_match = lookup(rule_tokens.back(), {T_EMPTY});
+        if (lookup_match == -1) {
+          // From the current first rule the deterministic source token is
+          // unreachable.
           cout << "No matching rule.\n";
           exit(EXIT_FAILURE);
-  //       }
-  //       source_token_string = T_EMPTY;
+        }
+        source_token_string = T_EMPTY;
       }
 
       if (verbose_mode) {
@@ -133,9 +133,13 @@ void LLAstBuilder::build_lookup_table(unsigned int ll_level) {
   if (verbose_mode) print_rule_lookup();
 }
 
-// @TODO Add lookup row uniqueness check!
 vector<vector<string>> LLAstBuilder::find_starting_tokens(string rule_name, unsigned int idx, int limit) {
   vector<vector<string>> parts({{}});
+
+  if (grammar->lines[rule_name].rules[idx].parts.size() == 0) {
+    parts[0].push_back(T_EMPTY);
+    return parts;
+  }
 
   for (auto & _part : grammar->lines[rule_name].rules[idx].parts) {
     if (!any_of(parts.begin(), parts.end(), [&limit](auto p){ return p.size() < limit; })) continue;
@@ -192,7 +196,7 @@ int LLAstBuilder::lookup(string rule_name, vector<string> tokens) {
       }
 
       bool is_match = true;
-      for (int i = 0; i < len; i++) {
+      for (unsigned int i = 0; i < len; i++) {
         if ((*lookup_it)[i] != tokens[i]) {
           is_match = false;
           break;
@@ -224,7 +228,7 @@ bool LLAstBuilder::is_lookup_table_valid() {
   for (auto lhs_group_kv : rule_lookup) {
     for (auto lhs_list : lhs_group_kv.second) {
 
-      for (int i = 0; i < grammar->lines[lhs_group_kv.first.first].rules.size(); i++) {
+      for (unsigned int i = 0; i < grammar->lines[lhs_group_kv.first.first].rules.size(); i++) {
         // Same group - skip it.
         if (i == lhs_group_kv.first.second) continue;
 
