@@ -126,9 +126,9 @@ public:
   }
 
   void test_lookahead_table_generator_empty_rules() {
-    // LookaheadTableGenerator *ltgp = build_lookahead_table_generator("A: B T_1\nB: T_2 |", 10);
-    // ASSERT(ltgp->generate());
-    // ASSERT_EQUAL((vector<vector<string>>{{"T_2", "T_1"}, {"T_2"}}), (ltgp->rule_lookup[{"A", 0}]));
+    LookaheadTableGenerator *ltgp = build_lookahead_table_generator("A: B T_1\nB: T_2 |", 1);
+    ASSERT(ltgp->generate());
+    ASSERT_EQUAL((vector<vector<string>>{{"T_2"}, {"T_EMPTY"}}), (ltgp->rule_lookup[{"A", 0}]));
   }
 
   // TOKENIZER TESTS ////////////////////////////////////////////////////////
