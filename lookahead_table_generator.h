@@ -14,7 +14,7 @@ public:
   unsigned int ll_max_level;
   bool verbose_mode;
 
-  LookaheadTableGenerator(Grammar *, unsigned int, bool);
+  LookaheadTableGenerator(Grammar *, unsigned int, bool = false);
   void print_rule_lookup();
   bool generate();
 

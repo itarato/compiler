@@ -4,6 +4,7 @@
 #include <map>
 #include <sstream>
 #include <string>
+#include <vector>
 
 using namespace std;
 
@@ -55,3 +56,6 @@ bool is_token(string);
 
 extern map<string, TokenType> token_translation_map;
 extern map<string, TokenType> keyword_translation_map;
+
+template<typename T> extern void var_dump(T);
+template<> void var_dump<vector<vector<basic_string<char>>>>(vector<vector<basic_string<char>>>);

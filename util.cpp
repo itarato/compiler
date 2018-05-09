@@ -1,5 +1,7 @@
 #include "util.h"
 
+#include <vector>
+
 ostream& operator<<(ostream& os, const TokenType& self) {
     os << token_e_to_s(self);
     return os;
@@ -57,3 +59,25 @@ string token_e_to_s(TokenType e_token) {
 bool token_eq(string s_token, TokenType e_token) {
     return token_s_to_e(s_token) == e_token;
 }
+
+template<typename T>
+void var_dump(T t) {
+  cout << t;
+}
+
+template<>
+void var_dump<vector<vector<basic_string<char>>>>(vector<vector<basic_string<char>>> vs) {
+  cout << "{ ";
+  for (auto & v : vs) {
+    cout << "{ ";
+    for (auto & e : v) {
+      cout << e << " ";
+    }
+    cout << "} ";
+  }
+  cout << "}";
+}
+
+template void var_dump<unsigned long>(unsigned long);
+template void var_dump<TokenType>(TokenType);
+template void var_dump<basic_string<char>>(basic_string<char>);

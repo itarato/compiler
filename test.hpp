@@ -14,11 +14,14 @@
 #include "grammar_normalizer.h"
 #include "ll_ast_builder.h"
 #include "tokenizer.h"
+#include "lookahead_table_generator.h"
+#include "util.h"
 
 using namespace std;
 
 #define ASSERT(t) assert((t), __FUNCTION__, __LINE__)
-#define ASSERT_EQUAL(lhs, rhs) assert_eq(lhs, rhs, __FUNCTION__, __LINE__)
+#define REFUTE(t) assert(!(t), __FUNCTION__, __LINE__)
+#define ASSERT_EQUAL(lhs, rhs) assert_eq((lhs), (rhs), __FUNCTION__, __LINE__)
 
 class Test {
 public:
@@ -33,6 +36,9 @@ public:
     test_grammar_multiple_rules();
     test_grammar_empty_rule();
     test_grammar_multiple_rule_parts();
+
+    test_lookahead_table_generator_basic();
+    test_lookahead_table_generator_leveling();
 
     test_tokenizer_end_of_program_is_added_always();
     test_tokenizer_source_can_end_empty_or_newline();
@@ -97,6 +103,23 @@ public:
     Grammar g(new_grammar_from_string("A: B C D"));
 
     ASSERT_EQUAL((size_t)3, g.lines["A"].rules[0].parts.size());
+  }
+
+  // LOOKAHEAD TABLE GENERATOR TESTS ////////////////////////////////////////
+
+  void test_lookahead_table_generator_basic() {
+    LookaheadTableGenerator *ltgp = build_lookahead_table_generator("A: B | B T_1 | T_2\nB: T_3", 2);
+    ASSERT(ltgp->generate());
+    ASSERT_EQUAL((unsigned long) 4, ltgp->rule_lookup.size());
+    ASSERT_EQUAL((vector<vector<string>>{{"T_3"}}), (ltgp->rule_lookup[{"A", 0}]));
+    ASSERT_EQUAL((vector<vector<string>>{{"T_3", "T_1"}}), (ltgp->rule_lookup[{"A", 1}]));
+    ASSERT_EQUAL((vector<vector<string>>{{"T_2"}}), (ltgp->rule_lookup[{"A", 2}]));
+    ASSERT_EQUAL((vector<vector<string>>{{"T_3"}}), (ltgp->rule_lookup[{"B", 0}]));
+  }
+
+  void test_lookahead_table_generator_leveling() {
+    REFUTE(build_lookahead_table_generator("A: B T_1 | B T_2\nB: T_3", 1)->generate());
+    ASSERT(build_lookahead_table_generator("A: B T_1 | B T_2\nB: T_3", 2)->generate());
   }
 
   // TOKENIZER TESTS ////////////////////////////////////////////////////////
@@ -284,8 +307,11 @@ private:
     bool result = assert(lhs == rhs, caller_name, line_no);
 
     if (!result) {
-      cout << "  \x1B[94mEXPECTED: " << lhs << "\x1B[0m\n";
-      cout << "    \x1B[95mACTUAL: " << rhs << "\x1B[0m\n";
+      cout << "  \x1B[94mEXPECTED: ";
+      var_dump(lhs);
+      cout << "\x1B[0m\n" << "    \x1B[95mACTUAL: ";
+      var_dump(rhs);
+      cout << "\x1B[0m\n";
     }
 
     return result;
@@ -344,5 +370,13 @@ private:
     normalized << g;
 
     ASSERT_EQUAL(expected, normalized.str());
+  }
+
+  LookaheadTableGenerator * build_lookahead_table_generator(string raw_grammar, unsigned int ll_max_level) {
+    istringstream grammar_iss(raw_grammar);
+    istream_iterator<string> grammar_isit(grammar_iss);
+    Grammar *pg = new Grammar(grammar_isit);
+
+    return new LookaheadTableGenerator(pg, ll_max_level);
   }
 };
