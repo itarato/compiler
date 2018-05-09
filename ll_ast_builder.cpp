@@ -1,23 +1,26 @@
 #include "ll_ast_builder.h"
+#include "ast_node.h"
 #include <algorithm>
 #include <iostream>
 #include <iterator>
 #include <map>
 #include <set>
 #include <utility>
-#include "ast_node.h"
 
+#include "lookahead_table_generator.h"
 #include "token.h"
 #include "util.h"
-#include "lookahead_table_generator.h"
 
 using namespace std;
 
-LLAstBuilder::LLAstBuilder(Grammar * grammar, Tokenizer *t, unsigned int ll_max_level, bool verbose_mode)
-    : grammar(grammar), tokenizer(t), ll_max_level(ll_max_level), verbose_mode(verbose_mode) {
+LLAstBuilder::LLAstBuilder(Grammar *grammar, Tokenizer *t,
+                           unsigned int ll_max_level, bool verbose_mode)
+    : grammar(grammar), tokenizer(t), ll_max_level(ll_max_level),
+      verbose_mode(verbose_mode) {
   LookaheadTableGenerator ltg(grammar, ll_max_level, verbose_mode);
 
-  if (!ltg.generate()) throw "Lookahead table cannot be generated.";
+  if (!ltg.generate())
+    throw "Lookahead table cannot be generated.";
   rule_lookup = ltg.rule_lookup;
 };
 
@@ -34,7 +37,7 @@ AstNode *LLAstBuilder::build() {
     if (verbose_mode) {
       cout << "\x1B[92mR\\\x1B[0m ";
       copy(rule_tokens.rbegin(), rule_tokens.rend(),
-          ostream_iterator<string>(cout, " "));
+           ostream_iterator<string>(cout, " "));
       cout << endl;
       cout << "\x1B[92mS/\x1B[0m ";
       for (auto it = source_tokens.rbegin(); it != source_tokens.rend(); it++)
@@ -46,7 +49,7 @@ AstNode *LLAstBuilder::build() {
     if (token_eq(rule_tokens.back(), source_tokens.back().type)) {
       if (verbose_mode) {
         cout << "Match - deterministic tokens: " << rule_tokens.back() << endl
-            << endl;
+             << endl;
       }
 
       node_stack.back().first->parts.push_back(
@@ -54,17 +57,6 @@ AstNode *LLAstBuilder::build() {
 
       rule_tokens.pop_back();
       source_tokens.pop_back();
-
-      while (node_stack.size() > 0 &&
-             rule_tokens.size() == node_stack.back().second) {
-        p_last_ast_node = node_stack.back().first;
-        node_stack.pop_back();
-
-        if (node_stack.size() > 0) {
-          node_stack.back().first->parts.push_back(
-              new_ast_node_part_node(p_last_ast_node));
-        }
-      }
     } else {
       // If rule is deterministic and not matching (prev cond).
       if (is_token(rule_tokens.back())) {
@@ -88,7 +80,8 @@ AstNode *LLAstBuilder::build() {
       }
 
       if (verbose_mode) {
-        cout << "Expand rule: " << rule_name << " at #" << lookup_match << endl << endl;
+        cout << "Expand rule: " << rule_name << " at #" << lookup_match << endl
+             << endl;
       }
 
       // If rule is obvious - expand.
@@ -96,8 +89,8 @@ AstNode *LLAstBuilder::build() {
           {new AstNode(rule_tokens.back()), rule_tokens.size() - 1});
       if (verbose_mode) {
         cout << "Added " << rule_tokens.back()
-            << " to node stack with marker: " << (rule_tokens.size() - 1)
-            << endl;
+             << " to node stack with marker: " << (rule_tokens.size() - 1)
+             << endl;
       }
 
       rule_tokens.pop_back();
@@ -105,16 +98,29 @@ AstNode *LLAstBuilder::build() {
            grammar->lines[rule_name].rules[lookup_match].parts.rend(),
            back_inserter(rule_tokens));
     }
+
+    while (node_stack.size() > 0 &&
+           rule_tokens.size() == node_stack.back().second) {
+      p_last_ast_node = node_stack.back().first;
+      node_stack.pop_back();
+
+      if (node_stack.size() > 0) {
+        node_stack.back().first->parts.push_back(
+            new_ast_node_part_node(p_last_ast_node));
+      }
+    }
   }
 
   return p_last_ast_node;
 }
 
 int LLAstBuilder::lookup(string rule_name, vector<string> tokens) {
-  for (auto it = grammar->lines[rule_name].rules.begin(); it != grammar->lines[rule_name].rules.end(); it++) {
+  for (auto it = grammar->lines[rule_name].rules.begin();
+       it != grammar->lines[rule_name].rules.end(); it++) {
     unsigned int idx = it - grammar->lines[rule_name].rules.begin();
     vector<vector<string>> &lookup = rule_lookup[{rule_name, idx}];
-    for (auto lookup_it = lookup.begin(); lookup_it != lookup.end(); lookup_it++) {
+    for (auto lookup_it = lookup.begin(); lookup_it != lookup.end();
+         lookup_it++) {
       unsigned int len = min(tokens.size(), lookup_it->size());
 
       if (len == 0) {

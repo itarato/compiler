@@ -74,9 +74,11 @@ int mode_llparse(int argc, char *argv[]) {
 
     LLAstBuilder llab(&g, &t, ll_level, true);
     AstNode *p_ast_node = llab.build();
-    
-    if (p_ast_node != nullptr) cout << *p_ast_node << endl;
-    else cout << "NO\n";
+
+    if (p_ast_node != nullptr)
+      cout << *p_ast_node << endl;
+    else
+      cout << "Source is not parsable.\n";
 
     return EXIT_SUCCESS;
 }

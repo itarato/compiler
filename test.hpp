@@ -39,6 +39,7 @@ public:
 
     test_lookahead_table_generator_basic();
     test_lookahead_table_generator_leveling();
+    test_lookahead_table_generator_empty_rules();
 
     test_tokenizer_end_of_program_is_added_always();
     test_tokenizer_source_can_end_empty_or_newline();
@@ -57,6 +58,8 @@ public:
 
     test_ll_ast_builder_examples();
     test_ll_ast_builder_one_lookahead();
+    test_ll_ast_builder_empty_rule_empty();
+    test_ll_ast_builder_empty_rule_nonempty();
 
     cout << endl
          << "\x1B[1mCOMPLETE\x1B[0m - \x1B[92mSUCCESS: " << success_count
@@ -120,6 +123,12 @@ public:
   void test_lookahead_table_generator_leveling() {
     REFUTE(build_lookahead_table_generator("A: B T_1 | B T_2\nB: T_3", 1)->generate());
     ASSERT(build_lookahead_table_generator("A: B T_1 | B T_2\nB: T_3", 2)->generate());
+  }
+
+  void test_lookahead_table_generator_empty_rules() {
+    // LookaheadTableGenerator *ltgp = build_lookahead_table_generator("A: B T_1\nB: T_2 |", 10);
+    // ASSERT(ltgp->generate());
+    // ASSERT_EQUAL((vector<vector<string>>{{"T_2", "T_1"}, {"T_2"}}), (ltgp->rule_lookup[{"A", 0}]));
   }
 
   // TOKENIZER TESTS ////////////////////////////////////////////////////////
@@ -281,6 +290,28 @@ public:
       (string) "{\"PROG\":[{\"A\":[{\"B\":[\"T_SUB(-)\"]},\"T_NUMBER(12)\"]}]}",
       ast_node_to_json(build_ll_ast(
         "PROG: A\nA: B T_NUMBER | B T_STRING\nB: T_ADD | T_SUB",
+        "-12",
+        2
+      ))
+    );
+  }
+
+  void test_ll_ast_builder_empty_rule_empty() {
+    ASSERT_EQUAL(
+      (string) "{\"PROG\":[{\"A\":[]},\"T_NUMBER(12)\"]}",
+      ast_node_to_json(build_ll_ast(
+        "PROG: A T_NUMBER\nA: T_SUB |",
+        "12",
+        2
+      ))
+    );
+  }
+
+  void test_ll_ast_builder_empty_rule_nonempty() {
+    ASSERT_EQUAL(
+      (string) "{\"PROG\":[{\"A\":[\"T_SUB(-)\"]},\"T_NUMBER(12)\"]}",
+      ast_node_to_json(build_ll_ast(
+        "PROG: A T_NUMBER\nA: T_SUB |",
         "-12",
         2
       ))

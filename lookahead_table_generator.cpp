@@ -20,7 +20,7 @@ bool LookaheadTableGenerator::generate() {
   }
 
   if (!found_valid_lookup_table) {
-    cout << "Error. No possible LL(" << ll_max_level << ") parser.\n";
+    if (verbose_mode) cout << "Error. No possible LL(" << ll_max_level << ") parser.\n";
     return false;
   }
 
