@@ -5,6 +5,7 @@
 
 #include "ast_builder.h"
 #include "ast_node.h"
+#include "globals.h"
 #include "grammar.h"
 #include "grammar_normalizer.h"
 #include "ll_ast_builder.h"
@@ -20,22 +21,30 @@ int mode_test();
 void print_help() noexcept;
 
 int main(int argc, char *argv[]) {
+  logger.log("Bin boot");
+
   if (argc <= 1) {
     print_help();
     exit(EXIT_FAILURE);
   }
 
+  int res;
+
   if (strcmp(argv[1], "parse") == 0) {
-    exit(mode_parse(argc, argv));
+    res = mode_parse(argc, argv);
   } else if (strcmp(argv[1], "grammar") == 0) {
-    exit(mode_grammar_translate(argc, argv));
+    res = mode_grammar_translate(argc, argv);
   } else if (strcmp(argv[1], "llparse") == 0) {
-    exit(mode_llparse(argc, argv));
+    res = mode_llparse(argc, argv);
   } else if (strcmp(argv[1], "test") == 0) {
-    exit(mode_test());
+    res = mode_test();
+  } else {
+    exit(EXIT_FAILURE);
   }
 
-  exit(EXIT_FAILURE);
+  logger.log("Finish");
+
+  exit(res);
 }
 
 int mode_parse(int argc, char *argv[]) {
