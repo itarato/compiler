@@ -16,16 +16,16 @@ using namespace std;
 typedef vector<Token>::iterator vec_iter_t;
 
 class AstBuilder {
-   public:
-    Grammar *grammar;
-    Tokenizer *tokenizer;
-    bool verbose_mode;
+ public:
+  Grammar *grammar;
+  Tokenizer *tokenizer;
+  bool verbose_mode;
 
-    AstBuilder(Grammar *, Tokenizer *, bool = false);
-    AstNode *build();
+  AstBuilder(Grammar *, Tokenizer *, bool = false);
+  AstNode *build();
 
-   private:
-    AstNode *try_grammar_line(GrammarLine *, vec_iter_t *, string);
-    AstNode *try_grammar_rule(GrammarRule *, vec_iter_t *, string);
-    bool is_token_match(string, Token);
+ private:
+  AstNode *try_grammar_line(GrammarLine *, vec_iter_t *, string);
+  AstNode *try_grammar_rule(GrammarRule *, vec_iter_t *, string);
+  bool is_token_match(string, Token);
 };
