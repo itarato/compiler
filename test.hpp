@@ -13,8 +13,8 @@
 #include "grammar.h"
 #include "grammar_normalizer.h"
 #include "ll_ast_builder.h"
-#include "tokenizer.h"
 #include "lookahead_table_generator.h"
+#include "tokenizer.h"
 #include "util.h"
 
 using namespace std;
@@ -24,7 +24,7 @@ using namespace std;
 #define ASSERT_EQUAL(lhs, rhs) assert_eq((lhs), (rhs), __FUNCTION__, __LINE__)
 
 class Test {
-public:
+ public:
   unsigned int success_count;
   unsigned int failure_count;
 
@@ -111,24 +111,33 @@ public:
   // LOOKAHEAD TABLE GENERATOR TESTS ////////////////////////////////////////
 
   void test_lookahead_table_generator_basic() {
-    LookaheadTableGenerator *ltgp = build_lookahead_table_generator("A: B | B T_1 | T_2\nB: T_3", 2);
+    LookaheadTableGenerator *ltgp =
+        build_lookahead_table_generator("A: B | B T_1 | T_2\nB: T_3", 2);
     ASSERT(ltgp->generate());
-    ASSERT_EQUAL((unsigned long) 4, ltgp->rule_lookup.size());
-    ASSERT_EQUAL((vector<vector<string>>{{"T_3"}}), (ltgp->rule_lookup[{"A", 0}]));
-    ASSERT_EQUAL((vector<vector<string>>{{"T_3", "T_1"}}), (ltgp->rule_lookup[{"A", 1}]));
-    ASSERT_EQUAL((vector<vector<string>>{{"T_2"}}), (ltgp->rule_lookup[{"A", 2}]));
-    ASSERT_EQUAL((vector<vector<string>>{{"T_3"}}), (ltgp->rule_lookup[{"B", 0}]));
+    ASSERT_EQUAL((unsigned long)4, ltgp->rule_lookup.size());
+    ASSERT_EQUAL((vector<vector<string>>{{"T_3"}}),
+                 (ltgp->rule_lookup[{"A", 0}]));
+    ASSERT_EQUAL((vector<vector<string>>{{"T_3", "T_1"}}),
+                 (ltgp->rule_lookup[{"A", 1}]));
+    ASSERT_EQUAL((vector<vector<string>>{{"T_2"}}),
+                 (ltgp->rule_lookup[{"A", 2}]));
+    ASSERT_EQUAL((vector<vector<string>>{{"T_3"}}),
+                 (ltgp->rule_lookup[{"B", 0}]));
   }
 
   void test_lookahead_table_generator_leveling() {
-    REFUTE(build_lookahead_table_generator("A: B T_1 | B T_2\nB: T_3", 1)->generate());
-    ASSERT(build_lookahead_table_generator("A: B T_1 | B T_2\nB: T_3", 2)->generate());
+    REFUTE(build_lookahead_table_generator("A: B T_1 | B T_2\nB: T_3", 1)
+               ->generate());
+    ASSERT(build_lookahead_table_generator("A: B T_1 | B T_2\nB: T_3", 2)
+               ->generate());
   }
 
   void test_lookahead_table_generator_empty_rules() {
-    LookaheadTableGenerator *ltgp = build_lookahead_table_generator("A: B T_1\nB: T_2 |", 1);
+    LookaheadTableGenerator *ltgp =
+        build_lookahead_table_generator("A: B T_1\nB: T_2 |", 1);
     ASSERT(ltgp->generate());
-    ASSERT_EQUAL((vector<vector<string>>{{"T_2"}, {"T_EMPTY"}}), (ltgp->rule_lookup[{"A", 0}]));
+    ASSERT_EQUAL((vector<vector<string>>{{"T_2"}, {"T_EMPTY"}}),
+                 (ltgp->rule_lookup[{"A", 0}]));
   }
 
   // TOKENIZER TESTS ////////////////////////////////////////////////////////
@@ -207,8 +216,9 @@ public:
     ASSERT_EQUAL((string) "{\"PROG\":[\"T_NUMBER(123)\",\"T_EOP()\"]}",
                  ast_node_to_json(build_ast("PROG: T_NUMBER T_EOP", "123")));
 
-    string expr_grammar = "PROG: EXPR T_EOP\nEXPR: T_NUMBER | T_PAREN_OPEN "
-                          "EXPR OP EXPR T_PAREN_CLOSE\nOP: T_ADD";
+    string expr_grammar =
+        "PROG: EXPR T_EOP\nEXPR: T_NUMBER | T_PAREN_OPEN "
+        "EXPR OP EXPR T_PAREN_CLOSE\nOP: T_ADD";
     ASSERT_EQUAL(
         (string) "{\"PROG\":[{\"EXPR\":[\"T_NUMBER(1)\"]},\"T_EOP()\"]}",
         ast_node_to_json(build_ast(expr_grammar, "1")));
@@ -297,30 +307,21 @@ public:
   }
 
   void test_ll_ast_builder_empty_rule_empty() {
-    ASSERT_EQUAL(
-      (string) "{\"PROG\":[{\"A\":[]},\"T_NUMBER(12)\"]}",
-      ast_node_to_json(build_ll_ast(
-        "PROG: A T_NUMBER\nA: T_SUB |",
-        "12",
-        2
-      ))
-    );
+    ASSERT_EQUAL((string) "{\"PROG\":[{\"A\":[]},\"T_NUMBER(12)\"]}",
+                 ast_node_to_json(
+                     build_ll_ast("PROG: A T_NUMBER\nA: T_SUB |", "12", 2)));
   }
 
   void test_ll_ast_builder_empty_rule_nonempty() {
     ASSERT_EQUAL(
-      (string) "{\"PROG\":[{\"A\":[\"T_SUB(-)\"]},\"T_NUMBER(12)\"]}",
-      ast_node_to_json(build_ll_ast(
-        "PROG: A T_NUMBER\nA: T_SUB |",
-        "-12",
-        2
-      ))
-    );
+        (string) "{\"PROG\":[{\"A\":[\"T_SUB(-)\"]},\"T_NUMBER(12)\"]}",
+        ast_node_to_json(
+            build_ll_ast("PROG: A T_NUMBER\nA: T_SUB |", "-12", 2)));
   }
 
   // PRIVATES ///////////////////////////////////////////////////////////////
 
-private:
+ private:
   bool assert(const bool test, const char *caller_name, unsigned int line_no) {
     if (test) {
       success_count++;
@@ -340,7 +341,8 @@ private:
     if (!result) {
       cout << "  \x1B[94mEXPECTED: ";
       var_dump(lhs);
-      cout << "\x1B[0m\n" << "    \x1B[95mACTUAL: ";
+      cout << "\x1B[0m\n"
+           << "    \x1B[95mACTUAL: ";
       var_dump(rhs);
       cout << "\x1B[0m\n";
     }
@@ -372,7 +374,8 @@ private:
     return a.build();
   }
 
-  AstNode *build_ll_ast(string raw_grammar, string raw_source, unsigned int ll_max_level = 1) {
+  AstNode *build_ll_ast(string raw_grammar, string raw_source,
+                        unsigned int ll_max_level = 1) {
     istringstream grammar_iss(raw_grammar);
     istream_iterator<string> grammar_isit(grammar_iss);
     Grammar *pg = new Grammar(grammar_isit);
@@ -403,7 +406,8 @@ private:
     ASSERT_EQUAL(expected, normalized.str());
   }
 
-  LookaheadTableGenerator * build_lookahead_table_generator(string raw_grammar, unsigned int ll_max_level) {
+  LookaheadTableGenerator *build_lookahead_table_generator(
+      string raw_grammar, unsigned int ll_max_level) {
     istringstream grammar_iss(raw_grammar);
     istream_iterator<string> grammar_isit(grammar_iss);
     Grammar *pg = new Grammar(grammar_isit);
