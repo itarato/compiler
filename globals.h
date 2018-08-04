@@ -1,5 +1,8 @@
 #pragma once
 
+#include <string>
 #include "logger.h"
 
-static StdLogger logger{};
+using namespace std;
+
+static StdLogger logger;

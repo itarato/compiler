@@ -21,7 +21,7 @@ int mode_test();
 void print_help() noexcept;
 
 int main(int argc, char *argv[]) {
-  logger.log("Bin boot");
+  logger.info("Bin boot");
 
   if (argc <= 1) {
     print_help();
@@ -42,7 +42,7 @@ int main(int argc, char *argv[]) {
     exit(EXIT_FAILURE);
   }
 
-  logger.log("Finish");
+  logger.info("Finish");
 
   exit(res);
 }
