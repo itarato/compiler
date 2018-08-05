@@ -1,22 +1,21 @@
 #pragma once
 
-#include <vector>
-#include <string>
 #include <iostream>
+#include <string>
+#include <vector>
 
 #include "ast_node_part.h"
 
 using namespace std;
 
-class AstNode {
-public:
+struct AstNode {
   string rule;
   vector<AstNodePart *> parts;
 
   AstNode(string);
   ~AstNode();
 
-  friend ostream & operator<<(ostream & os, const AstNode & self) {
+  friend ostream &operator<<(ostream &os, const AstNode &self) {
     os << "{\"" << self.rule << "\":[";
 
     for (auto it = self.parts.begin(); it != self.parts.end(); it++) {

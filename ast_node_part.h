@@ -4,13 +4,12 @@
 
 #include "token.h"
 
-class AstNode;
-ostream & operator<<(ostream &, const AstNode &);
+struct AstNode;
+ostream &operator<<(ostream &, const AstNode &);
 
 using namespace std;
 
-class AstNodePart {
-public:
+struct AstNodePart {
   AstNode *p_node;
   Token token;
   bool is_node;
@@ -18,7 +17,7 @@ public:
   AstNodePart(bool);
   ~AstNodePart();
 
-  friend ostream & operator<<(ostream & os, const AstNodePart & self) {
+  friend ostream &operator<<(ostream &os, const AstNodePart &self) {
     if (self.is_node) {
       os << *self.p_node;
     } else {
@@ -29,5 +28,5 @@ public:
   };
 };
 
-AstNodePart* new_ast_node_part_node(AstNode *);
-AstNodePart* new_ast_node_part_token(Token);
+AstNodePart *new_ast_node_part_node(AstNode *);
+AstNodePart *new_ast_node_part_token(Token);

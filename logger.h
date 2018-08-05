@@ -9,16 +9,6 @@ class Logger {
  public:
   virtual void log(string, unsigned int, string) = 0;
 
-  void log_all(string, unsigned int, string);
-
-  template <typename T1, typename T2, typename... Args>
-  inline void log_all(string kind, unsigned int color, T1 lhs, T2 rhs,
-                      Args... args) {
-    ostringstream buf{};
-    buf << lhs << " " << rhs;
-    log_all(kind, color, buf.str(), args...);
-  }
-
   void info(string);
 
   template <typename T1, typename T2, typename... Args>
@@ -31,6 +21,17 @@ class Logger {
   template <typename T1, typename T2, typename... Args>
   inline void error(T1 lhs, T2 rhs, Args... args) {
     log_all("ERROR", 91, lhs, rhs, args...);
+  }
+
+ private:
+  void log_all(string, unsigned int, string);
+
+  template <typename T1, typename T2, typename... Args>
+  inline void log_all(string kind, unsigned int color, T1 lhs, T2 rhs,
+                      Args... args) {
+    ostringstream buf{};
+    buf << lhs << " " << rhs;
+    log_all(kind, color, buf.str(), args...);
   }
 };
 

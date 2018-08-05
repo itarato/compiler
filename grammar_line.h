@@ -7,8 +7,7 @@
 
 using namespace std;
 
-class GrammarLine {
- public:
+struct GrammarLine {
   vector<GrammarRule> rules;
   void add_rule(GrammarRule);
 

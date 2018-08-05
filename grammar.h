@@ -9,23 +9,22 @@
 
 using namespace std;
 
-class Grammar {
-   public:
-    map<string, GrammarLine> lines;
+struct Grammar {
+  map<string, GrammarLine> lines;
 
-    Grammar(istream_iterator<string>);
+  Grammar(istream_iterator<string>);
 
-    bool is_line_def(string);
-    bool is_rule_divider(string);
-    void save_grammar_line(GrammarLine *, string);
+  bool is_line_def(string);
+  bool is_rule_divider(string);
+  void save_grammar_line(GrammarLine *, string);
 
-    friend ostream &operator<<(ostream &os, const Grammar &self) {
-        for (auto const line : self.lines) {
-            os << line.first << ": " << line.second << endl;
-        }
-        return os;
-    };
+  friend ostream &operator<<(ostream &os, const Grammar &self) {
+    for (auto const line : self.lines) {
+      os << line.first << ": " << line.second << endl;
+    }
+    return os;
+  };
 };
 
-Grammar new_grammar_from_filename(char*);
+Grammar new_grammar_from_filename(char *);
 Grammar new_grammar_from_string(string);
