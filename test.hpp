@@ -7,9 +7,9 @@
 #include <sstream>
 #include <string>
 #include <vector>
-
 #include "ast_builder.h"
 #include "ast_node.h"
+#include "globals.h"
 #include "grammar.h"
 #include "grammar_normalizer.h"
 #include "ll_ast_builder.h"
@@ -325,10 +325,10 @@ class Test {
   bool assert(const bool test, const char *caller_name, unsigned int line_no) {
     if (test) {
       success_count++;
-      cout << "\x1B[92mPASS\x1B[0m " << caller_name << " @" << line_no << endl;
+      logger.info("\x1B[92mPASS\x1B[0m ", caller_name, "@", line_no);
     } else {
       failure_count++;
-      cout << "\x1B[91mFAIL\x1B[0m " << caller_name << " @" << line_no << endl;
+      logger.error("\x1B[91mFAIL\x1B[0m ", caller_name, "@", line_no);
     }
     return test;
   };

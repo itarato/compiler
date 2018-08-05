@@ -3,8 +3,8 @@
 #include <vector>
 
 ostream& operator<<(ostream& os, const TokenType& self) {
-    os << token_e_to_s(self);
-    return os;
+  os << token_e_to_s(self);
+  return os;
 }
 
 map<string, TokenType> token_translation_map{
@@ -40,37 +40,38 @@ map<string, TokenType> keyword_translation_map{
 };
 
 bool is_token(string rule_part) {
-    return rule_part.at(0) == 'T' && rule_part.at(1) == '_';
+  return rule_part.at(0) == 'T' && rule_part.at(1) == '_';
 }
 
 TokenType token_s_to_e(string s_token) {
-    auto it = token_translation_map.find(s_token);
-    if (it != token_translation_map.end()) return it->second;
-    return TokenType::INVALID;
+  auto it = token_translation_map.find(s_token);
+  if (it != token_translation_map.end()) return it->second;
+  return TokenType::INVALID;
 }
 
 string token_e_to_s(TokenType e_token) {
-    for (auto& pair : token_translation_map) {
-        if (pair.second == e_token) return pair.first;
-    }
-    return "";
+  for (auto& pair : token_translation_map) {
+    if (pair.second == e_token) return pair.first;
+  }
+  return "";
 }
 
 bool token_eq(string s_token, TokenType e_token) {
-    return token_s_to_e(s_token) == e_token;
+  return token_s_to_e(s_token) == e_token;
 }
 
-template<typename T>
+template <typename T>
 void var_dump(T t) {
   cout << t;
 }
 
-template<>
-void var_dump<vector<vector<basic_string<char>>>>(vector<vector<basic_string<char>>> vs) {
+template <>
+void var_dump<vector<vector<basic_string<char>>>>(
+    vector<vector<basic_string<char>>> vs) {
   cout << "{ ";
-  for (auto & v : vs) {
+  for (auto& v : vs) {
     cout << "{ ";
-    for (auto & e : v) {
+    for (auto& e : v) {
       cout << e << " ";
     }
     cout << "} ";

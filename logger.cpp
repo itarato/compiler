@@ -10,27 +10,9 @@ void Logger::log_all(string kind, unsigned int color, string s) {
   log(kind, color, s);
 }
 
-template <typename T1, typename T2, typename... Args>
-void Logger::log_all(string kind, unsigned int color, T1 lhs, T2 rhs,
-                     Args... args) {
-  ostringstream buf{};
-  buf << lhs << " " << rhs;
-  log_all(kind, color, buf.str(), args...);
-}
-
 void Logger::info(string s) { log("INFO", 94, s); }
 
-template <typename T1, typename T2, typename... Args>
-void Logger::info(T1 lhs, T2 rhs, Args... args) {
-  log_all("INFO", 94, lhs, rhs, args...);
-}
-
 void Logger::error(string s) { log("ERROR", 91, s); }
-
-template <typename T1, typename T2, typename... Args>
-void Logger::error(T1 lhs, T2 rhs, Args... args) {
-  log_all("ERROR", 91, lhs, rhs, args...);
-}
 
 void StdLogger::log(string kind, unsigned int color, string s) {
   auto time_res = time(nullptr);
