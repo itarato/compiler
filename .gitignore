@@ -5,3 +5,4 @@ experiment
 *.o
 *.out
 *.gch
+.idea
