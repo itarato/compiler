@@ -6,7 +6,7 @@
 
 using namespace std;
 
-void Logger::log_all(string kind, unsigned int color, string s) {
+void Logger::log_all(string &&kind, unsigned int color, string &&s) {
   log(kind, color, s);
 }
 

@@ -7,6 +7,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <utility>
 #include "ast_builder.h"
 #include "ast_node.h"
 #include "globals.h"
@@ -325,10 +326,10 @@ class Test {
   bool assert(const bool test, const char *caller_name, unsigned int line_no) {
     if (test) {
       success_count++;
-      logger.info("\x1B[92mPASS\x1B[0m ", caller_name, "@", line_no);
+      logger.info(forward<string>("\x1B[92mPASS\x1B[0m "), caller_name, "@", line_no);
     } else {
       failure_count++;
-      logger.error("\x1B[91mFAIL\x1B[0m ", caller_name, "@", line_no);
+      logger.error(forward<string>("\x1B[91mFAIL\x1B[0m "), caller_name, "@", line_no);
     }
     return test;
   };
