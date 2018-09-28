@@ -6,3 +6,8 @@ experiment
 *.out
 *.gch
 .idea
+CMakeCache.txt
+CMakeFiles
+cmake_install.cmake
+compiler
+Makefile

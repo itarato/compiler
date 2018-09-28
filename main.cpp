@@ -9,6 +9,7 @@
 #include "grammar.h"
 #include "grammar_normalizer.h"
 #include "ll_ast_builder.h"
+#include "logger.h"
 #include "test.hpp"
 #include "tokenizer.h"
 
