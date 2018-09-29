@@ -23,9 +23,7 @@ Grammar::Grammar(istream_iterator<string> grammar_isi) {
         if (is_line_def(word)) {
             if (grammar_line != nullptr) {
                 grammar_line->add_rule(*grammar_rule);
-                grammar_rule = new GrammarRule();
                 save_grammar_line(grammar_line, grammar_line_name);
-                grammar_line = nullptr;
             }
             word.pop_back();
             grammar_line = new GrammarLine();
@@ -42,7 +40,6 @@ Grammar::Grammar(istream_iterator<string> grammar_isi) {
     }
     grammar_line->add_rule(*grammar_rule);
     save_grammar_line(grammar_line, grammar_line_name);
-    grammar_line = nullptr;
 }
 
 bool Grammar::is_line_def(string word) {
