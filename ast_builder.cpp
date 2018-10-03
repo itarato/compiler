@@ -12,6 +12,7 @@
 #include "token.h"
 #include "tokenizer.h"
 #include "util.h"
+#include "globals.h"
 
 using namespace std;
 
@@ -31,17 +32,23 @@ AstBuilder::AstBuilder(Grammar *grammar, Tokenizer *tokenizer,
 
 AstNode *AstBuilder::build() {
   if (verbose_mode) cout << "BUILD" << endl;
-  vec_iter_t it = tokenizer->tokens.begin();
-  return try_grammar_line(&(grammar->lines[START_RULE]), &it, START_RULE);
+  auto it = tokenizer->tokens.begin();
+  return try_grammar_line(grammar->lines[START_RULE], &it, START_RULE);
 };
 
-AstNode *AstBuilder::try_grammar_line(GrammarLine *gr_line,
+AstNode *AstBuilder::try_grammar_line(unique_ptr<GrammarLine> &gr_line,
                                       vec_iter_t *token_it, string rule_name) {
   indent++;
 
-  if (verbose_mode)
+  if (!gr_line) {
+    logger.error("Missing grammar line for rule", rule_name);
+  }
+
+  if (verbose_mode) {
     cout << indent_str() << "Try line: \x1B[96m" << *gr_line
          << "\x1B[0mon: \x1B[96m" << **token_it << "\x1B[0m" << endl;
+  }
+
   auto orig_token_it = *token_it;
 
   for (auto rule : gr_line->rules) {
@@ -94,7 +101,7 @@ AstNode *AstBuilder::try_grammar_rule(GrammarRule *rule, vec_iter_t *token_it,
       }
     } else {
       AstNode *p_part_ast_node =
-          try_grammar_line(&grammar->lines[rule_part], token_it, rule_part);
+          try_grammar_line(grammar->lines[rule_part], token_it, rule_part);
       if (p_part_ast_node == nullptr) {
         // Abort
         delete p_ast_node;

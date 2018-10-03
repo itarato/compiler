@@ -21,7 +21,7 @@ void GrammarNormalizer::eliminate_left_recursive() {
   string left_rec_tag = get_left_recursive_tag();
   if (left_rec_tag.size() == 0) return;
 
-  auto & rec_rules = grammar->lines[left_rec_tag].rules;
+  auto & rec_rules = grammar->lines[left_rec_tag]->rules;
 
   // Extract (and remove) left recursive rules.
   vector<GrammarRule> removed_rules;
@@ -32,7 +32,7 @@ void GrammarNormalizer::eliminate_left_recursive() {
   // Create new rule for indirection.
   string new_line_name(left_rec_tag);
   new_line_name.append("_X");
-  grammar->lines[new_line_name] = GrammarLine();
+  grammar->lines[new_line_name] = make_unique<GrammarLine>();
 
   // Add proxies into old rule pointing to new rule.
   vector<GrammarRule> new_rules;
@@ -52,10 +52,10 @@ void GrammarNormalizer::eliminate_left_recursive() {
   for (auto &removed_rule : removed_rules) {
     GrammarRule modified_removed_rule(removed_rule);
     modified_removed_rule.parts.erase(modified_removed_rule.parts.begin());
-    grammar->lines[new_line_name].rules.push_back(modified_removed_rule);
+    grammar->lines[new_line_name]->rules.push_back(modified_removed_rule);
 
     modified_removed_rule.parts.push_back(new_line_name);
-    grammar->lines[new_line_name].rules.push_back(modified_removed_rule);
+    grammar->lines[new_line_name]->rules.push_back(modified_removed_rule);
   }
 
   eliminate_left_recursive();
@@ -63,7 +63,7 @@ void GrammarNormalizer::eliminate_left_recursive() {
 
 string GrammarNormalizer::get_left_recursive_tag() {
   for (auto it = grammar->lines.begin(); it != grammar->lines.end(); it++) {
-    for (auto & rule : it->second.rules) {
+    for (auto & rule : it->second->rules) {
       if (rule.parts.size() == 0) continue;
 
       if (rule.parts[0] == it->first) {
@@ -76,10 +76,10 @@ string GrammarNormalizer::get_left_recursive_tag() {
 
 void GrammarNormalizer::eliminate_premature_match() {
   for (auto & line : grammar->lines) {
-    for (unsigned int i = 1; i < line.second.rules.size(); i++) {
+    for (unsigned int i = 1; i < line.second->rules.size(); i++) {
       for (int j = i - 1; j >= 0; j--) {
-        if (compare_rules(*(line.second.rules.begin() + i), *(line.second.rules.begin() + j)) == -1) {
-          iter_swap(line.second.rules.begin() + i, line.second.rules.begin() + j);
+        if (compare_rules(*(line.second->rules.begin() + i), *(line.second->rules.begin() + j)) == -1) {
+          iter_swap(line.second->rules.begin() + i, line.second->rules.begin() + j);
         }
       }
     }

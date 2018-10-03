@@ -3,6 +3,12 @@
 #include <iostream>
 #include <memory>
 
+#include <execinfo.h>
+#include <signal.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+
 #include "ast_builder.h"
 #include "ast_node.h"
 #include "globals.h"
@@ -15,6 +21,8 @@
 
 using namespace std;
 
+
+void sigsegv_handler(int);
 int mode_parse(int, char *[]);
 int mode_llparse(int, char *[]);
 int mode_grammar_translate(int, char *[]);
@@ -22,6 +30,8 @@ int mode_test();
 void print_help() noexcept;
 
 int main(int argc, char *argv[]) {
+  signal(SIGSEGV, sigsegv_handler);
+
   logger.info("Bin boot");
 
   if (argc <= 1) {
@@ -63,7 +73,8 @@ int mode_parse(int argc, char *argv[]) {
   AstBuilder ab(&g, &t, true);
   unique_ptr<AstNode> p_ast_node(ab.build());
 
-  if (p_ast_node != nullptr) cout << *p_ast_node << endl;
+  if (p_ast_node != nullptr)
+    cout << *p_ast_node << endl;
 
   return EXIT_SUCCESS;
 }
@@ -124,4 +135,13 @@ void print_help() noexcept {
   cout << "Usage for LL1-language parsing: ./main llparse GRAMMAR SOURCE";
   cout << "Usage for grammar correction: ./main grammar GRAMMAR\n";
   cout << "Usage for testing: ./main test\n";
+}
+
+void sigsegv_handler(int sig) {
+  void *array[20];
+  int size = backtrace(array, 20);
+
+  fprintf(stderr, "Error: signal %d:\n", sig);
+  backtrace_symbols_fd(array, size, STDERR_FILENO);
+  exit(1);
 }

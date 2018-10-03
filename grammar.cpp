@@ -6,12 +6,13 @@
 #include <string>
 #include <fstream>
 #include <sstream>
+#include <memory>
 
 #include "grammar_line.h"
 #include "grammar_rule.h"
 
 Grammar::Grammar(istream_iterator<string> grammar_isi) {
-    GrammarLine *grammar_line = nullptr;
+    unique_ptr<GrammarLine> grammar_line;
     GrammarRule *grammar_rule = nullptr;
     string grammar_line_name;
 
@@ -21,12 +22,12 @@ Grammar::Grammar(istream_iterator<string> grammar_isi) {
         string word(*grammar_isi);
 
         if (is_line_def(word)) {
-            if (grammar_line != nullptr) {
+            if (grammar_line) {
                 grammar_line->add_rule(*grammar_rule);
-                save_grammar_line(grammar_line, grammar_line_name);
+                save_grammar_line(forward<unique_ptr<GrammarLine>>(grammar_line), grammar_line_name);
             }
             word.pop_back();
-            grammar_line = new GrammarLine();
+            grammar_line = make_unique<GrammarLine>();
             grammar_rule = new GrammarRule();
             grammar_line_name = word;
         } else if (is_rule_divider(word)) {
@@ -39,7 +40,7 @@ Grammar::Grammar(istream_iterator<string> grammar_isi) {
         grammar_isi++;
     }
     grammar_line->add_rule(*grammar_rule);
-    save_grammar_line(grammar_line, grammar_line_name);
+    save_grammar_line(forward<unique_ptr<GrammarLine>>(grammar_line), grammar_line_name);
 }
 
 bool Grammar::is_line_def(string word) {
@@ -48,9 +49,9 @@ bool Grammar::is_line_def(string word) {
 
 bool Grammar::is_rule_divider(string word) { return word == "|"; }
 
-void Grammar::save_grammar_line(GrammarLine *grammar_line, string name) {
-    if (grammar_line == nullptr) return;
-    lines[name] = *grammar_line;
+void Grammar::save_grammar_line(unique_ptr<GrammarLine> grammar_line, string name) {
+    if (!grammar_line) return;
+    grammar_line.swap(lines[name]);
 }
 
 Grammar new_grammar_from_filename(char *filename) {

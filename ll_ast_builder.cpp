@@ -94,8 +94,8 @@ AstNode *LLAstBuilder::build() {
       }
 
       rule_tokens.pop_back();
-      copy(grammar->lines[rule_name].rules[lookup_match].parts.rbegin(),
-           grammar->lines[rule_name].rules[lookup_match].parts.rend(),
+      copy(grammar->lines[rule_name]->rules[lookup_match].parts.rbegin(),
+           grammar->lines[rule_name]->rules[lookup_match].parts.rend(),
            back_inserter(rule_tokens));
     }
 
@@ -115,9 +115,9 @@ AstNode *LLAstBuilder::build() {
 }
 
 int LLAstBuilder::lookup(string rule_name, vector<string> tokens) {
-  for (auto it = grammar->lines[rule_name].rules.begin();
-       it != grammar->lines[rule_name].rules.end(); it++) {
-    unsigned int idx = it - grammar->lines[rule_name].rules.begin();
+  for (auto it = grammar->lines[rule_name]->rules.begin();
+       it != grammar->lines[rule_name]->rules.end(); it++) {
+    unsigned int idx = it - grammar->lines[rule_name]->rules.begin();
     vector<vector<string>> &lookup = rule_lookup[{rule_name, idx}];
     for (auto lookup_it = lookup.begin(); lookup_it != lookup.end();
          lookup_it++) {

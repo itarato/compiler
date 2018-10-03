@@ -35,9 +35,9 @@ bool LookaheadTableGenerator::generate() {
 
 void LookaheadTableGenerator::build_lookup_table(unsigned int ll_level) {
   for (auto& grammar_line_pair : grammar->lines) {
-    for (auto rule_it = grammar_line_pair.second.rules.begin();
-         rule_it != grammar_line_pair.second.rules.end(); rule_it++) {
-      unsigned int idx = rule_it - grammar_line_pair.second.rules.begin();
+    for (auto rule_it = grammar_line_pair.second->rules.begin();
+         rule_it != grammar_line_pair.second->rules.end(); rule_it++) {
+      unsigned int idx = rule_it - grammar_line_pair.second->rules.begin();
 
       rule_lookup[{grammar_line_pair.first, idx}] =
           find_starting_tokens(grammar_line_pair.first, idx, ll_level);
@@ -51,12 +51,12 @@ vector<vector<string>> LookaheadTableGenerator::find_starting_tokens(
     string rule_name, unsigned int idx, int limit) {
   vector<vector<string>> parts({{}});
 
-  if (grammar->lines[rule_name].rules[idx].parts.size() == 0) {
+  if (grammar->lines[rule_name]->rules[idx].parts.size() == 0) {
     parts[0].push_back(T_EMPTY);
     return parts;
   }
 
-  for (auto& _part : grammar->lines[rule_name].rules[idx].parts) {
+  for (auto& _part : grammar->lines[rule_name]->rules[idx].parts) {
     if (!any_of(parts.begin(), parts.end(),
                 [&limit](auto p) { return p.size() < limit; }))
       continue;
@@ -74,9 +74,9 @@ vector<vector<string>> LookaheadTableGenerator::find_starting_tokens(
     } else {
       vector<vector<string>> new_parts({});
 
-      for (auto it = grammar->lines[_part].rules.begin();
-           it != grammar->lines[_part].rules.end(); it++) {
-        unsigned int _idx = it - grammar->lines[_part].rules.begin();
+      for (auto it = grammar->lines[_part]->rules.begin();
+           it != grammar->lines[_part]->rules.end(); it++) {
+        unsigned int _idx = it - grammar->lines[_part]->rules.begin();
         unsigned int min_size = 0;
         if (parts.size() > 0) {
           auto min_elem_it =
@@ -123,7 +123,7 @@ bool LookaheadTableGenerator::is_lookup_table_valid() {
   for (auto lhs_group_kv : rule_lookup) {
     for (auto lhs_list : lhs_group_kv.second) {
       for (unsigned int i = 0;
-           i < grammar->lines[lhs_group_kv.first.first].rules.size(); i++) {
+           i < grammar->lines[lhs_group_kv.first.first]->rules.size(); i++) {
         // Same group - skip it.
         if (i == lhs_group_kv.first.second) continue;
 

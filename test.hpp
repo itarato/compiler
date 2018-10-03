@@ -75,9 +75,9 @@ class Test {
 
     ASSERT_EQUAL((size_t)1, g.lines.size());
     ASSERT(g.lines.find("PROG") != g.lines.end());
-    ASSERT_EQUAL((size_t)1, g.lines["PROG"].rules.size());
-    ASSERT_EQUAL((size_t)1, g.lines["PROG"].rules[0].parts.size());
-    ASSERT_EQUAL((string) "T_EOF", g.lines["PROG"].rules[0].parts[0]);
+    ASSERT_EQUAL((size_t)1, g.lines["PROG"]->rules.size());
+    ASSERT_EQUAL((size_t)1, g.lines["PROG"]->rules[0].parts.size());
+    ASSERT_EQUAL((string) "T_EOF", g.lines["PROG"]->rules[0].parts[0]);
   };
 
   void test_grammar_multiline() {
@@ -89,24 +89,24 @@ class Test {
   void test_grammar_multiple_rules() {
     Grammar g(new_grammar_from_string("A: B | C | D"));
 
-    ASSERT_EQUAL((size_t)3, g.lines["A"].rules.size());
+    ASSERT_EQUAL((size_t)3, g.lines["A"]->rules.size());
   }
 
   void test_grammar_empty_rule() {
     Grammar g1(new_grammar_from_string("A: "));
-    ASSERT_EQUAL((size_t)0, g1.lines["A"].rules[0].parts.size());
+    ASSERT_EQUAL((size_t)0, g1.lines["A"]->rules[0].parts.size());
 
     Grammar g2(new_grammar_from_string("A: B |"));
-    ASSERT_EQUAL((size_t)0, g2.lines["A"].rules[1].parts.size());
+    ASSERT_EQUAL((size_t)0, g2.lines["A"]->rules[1].parts.size());
 
     Grammar g3(new_grammar_from_string("A: B | | C"));
-    ASSERT_EQUAL((size_t)0, g3.lines["A"].rules[1].parts.size());
+    ASSERT_EQUAL((size_t)0, g3.lines["A"]->rules[1].parts.size());
   }
 
   void test_grammar_multiple_rule_parts() {
     Grammar g(new_grammar_from_string("A: B C D"));
 
-    ASSERT_EQUAL((size_t)3, g.lines["A"].rules[0].parts.size());
+    ASSERT_EQUAL((size_t)3, g.lines["A"]->rules[0].parts.size());
   }
 
   // LOOKAHEAD TABLE GENERATOR TESTS ////////////////////////////////////////
