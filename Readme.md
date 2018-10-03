@@ -44,26 +44,26 @@ The LL(N) parser accepts a maximum N when generating the lookahead table. If the
 
 # Build
 
-Requires Clang++.
+Requires Clang++, make, CMake.
 
 ```
-make && ./main test
+cmake . && make && ./compiler test
 ```
 
 # Usage
 
 - Normalize grammar:
 
-`./main grammar GRAMMAR_FILE`
+`./compiler grammar GRAMMAR_FILE`
 
 - Use backtrack parser:
 
-`./main parse GRAMMAR_FILE SOURCE_FILE`
+`./compiler parse GRAMMAR_FILE SOURCE_FILE`
 
 - Use LL(N) parser:
 
-`./main llparse GRAMMAR_FILE SOURCE_FILE LOOKAHEAD_MAXIMUM`
+`./compiler llparse GRAMMAR_FILE SOURCE_FILE LOOKAHEAD_MAXIMUM`
 
 - Run tests:
 
-`./main test`
+`./compiler test`
