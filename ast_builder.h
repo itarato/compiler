@@ -27,5 +27,5 @@ class AstBuilder {
  private:
   AstNode *try_grammar_line(unique_ptr<GrammarLine> &, vec_iter_t *, string);
   AstNode *try_grammar_rule(GrammarRule *, vec_iter_t *, string);
-  bool is_token_match(string, Token);
+  bool is_token_match(const string &, Token) const;
 };

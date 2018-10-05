@@ -48,7 +48,7 @@ enum TokenType {
 
 TokenType token_s_to_e(string);
 string token_e_to_s(TokenType);
-bool token_eq(string, TokenType);
+bool token_eq(const string &, TokenType &);
 
 ostream &operator<<(ostream &, const TokenType &);
 

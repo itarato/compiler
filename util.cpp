@@ -56,7 +56,7 @@ string token_e_to_s(TokenType e_token) {
   return "";
 }
 
-bool token_eq(string s_token, TokenType e_token) {
+bool token_eq(const string & s_token, TokenType & e_token) {
   return token_s_to_e(s_token) == e_token;
 }
 

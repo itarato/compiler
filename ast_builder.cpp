@@ -80,7 +80,7 @@ AstNode *AstBuilder::try_grammar_rule(GrammarRule *rule, vec_iter_t *token_it,
   // Make new AstNode
   AstNode *p_ast_node = new AstNode(rule_name);
 
-  for (const auto rule_part : rule->parts) {
+  for (const auto & rule_part : rule->parts) {
     if (is_token(rule_part)) {
       if (is_token_match(rule_part, **token_it)) {
         if (verbose_mode)
@@ -122,6 +122,6 @@ AstNode *AstBuilder::try_grammar_rule(GrammarRule *rule, vec_iter_t *token_it,
   return p_ast_node;
 }
 
-bool AstBuilder::is_token_match(string rule_part, Token token) {
+bool AstBuilder::is_token_match(const string & rule_part, Token token) const {
   return token_eq(rule_part, token.type);
 }
