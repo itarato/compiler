@@ -3,8 +3,8 @@
 #include <iostream>
 #include <iterator>
 #include <map>
-#include <string>
 #include <memory>
+#include <string>
 
 #include "grammar_line.h"
 
@@ -20,7 +20,7 @@ struct Grammar {
   void save_grammar_line(unique_ptr<GrammarLine>, string);
 
   friend ostream &operator<<(ostream &os, const Grammar &self) {
-    for (auto const & line : self.lines) {
+    for (auto const &line : self.lines) {
       os << line.first << ": " << *line.second << endl;
     }
     return os;

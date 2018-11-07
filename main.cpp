@@ -18,6 +18,7 @@
 #include "logger.h"
 #include "test.hpp"
 #include "tokenizer.h"
+#include "bottom_top_ast_builder.h"
 
 using namespace std;
 
@@ -25,6 +26,7 @@ using namespace std;
 void sigsegv_handler(int);
 int mode_parse(int, char *[]);
 int mode_llparse(int, char *[]);
+int mode_btparse(int, char *[]);
 int mode_grammar_translate(int, char *[]);
 int mode_test();
 void print_help() noexcept;
@@ -47,6 +49,8 @@ int main(int argc, char *argv[]) {
     res = mode_grammar_translate(argc, argv);
   } else if (strcmp(argv[1], "llparse") == 0) {
     res = mode_llparse(argc, argv);
+  } else if (strcmp(argv[1], "btparse") == 0) {
+    res = mode_btparse(argc, argv);
   } else if (strcmp(argv[1], "test") == 0) {
     res = mode_test();
   } else {
@@ -105,6 +109,29 @@ int mode_llparse(int argc, char *argv[]) {
   return EXIT_SUCCESS;
 }
 
+int mode_btparse(int argc, char *argv[]) {
+  if (argc != 4) {
+    print_help();
+    return EXIT_FAILURE;
+  }
+
+  Grammar g(new_grammar_from_filename(argv[2]));
+  cout << g << endl;
+
+  Tokenizer t(new_tokenizer_from_filename(argv[3]));
+  cout << t << endl;
+
+  BottomTopAstBuilder btab(&g, &t, true);
+  unique_ptr<AstNode> p_ast_node(btab.build());
+
+  if (p_ast_node != nullptr)
+    cout << *p_ast_node << endl;
+  else
+    cout << "Source is not parsable.\n";
+
+  return EXIT_SUCCESS;
+}
+
 int mode_grammar_translate(int argc, char *argv[]) {
   if (argc != 3) {
     print_help();
@@ -133,6 +160,7 @@ void print_help() noexcept {
   cout << "Invocation error.\n";
   cout << "Usage for parsing: ./main parse GRAMMAR SOURCE\n";
   cout << "Usage for LL1-language parsing: ./main llparse GRAMMAR SOURCE";
+  cout << "Usage for bottom to top parsing: ./main btparse GRAMMAR SOURCE";
   cout << "Usage for grammar correction: ./main grammar GRAMMAR\n";
   cout << "Usage for testing: ./main test\n";
 }
