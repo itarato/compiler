@@ -6,8 +6,8 @@
 #include <iterator>
 #include <sstream>
 #include <string>
-#include <vector>
 #include <utility>
+#include <vector>
 #include "ast_builder.h"
 #include "ast_node.h"
 #include "globals.h"
@@ -37,6 +37,7 @@ class Test {
     test_grammar_multiple_rules();
     test_grammar_empty_rule();
     test_grammar_multiple_rule_parts();
+    test_grammar_flatten();
 
     test_lookahead_table_generator_basic();
     test_lookahead_table_generator_leveling();
@@ -107,6 +108,11 @@ class Test {
     Grammar g(new_grammar_from_string("A: B C D"));
 
     ASSERT_EQUAL((size_t)3, g.lines["A"]->rules[0].parts.size());
+  }
+
+  void test_grammar_flatten() {
+    Grammar g(new_grammar_from_string("A: B | C"));
+    ASSERT_EQUAL((size_t)2, g.flatten().size());
   }
 
   // LOOKAHEAD TABLE GENERATOR TESTS ////////////////////////////////////////
@@ -326,10 +332,12 @@ class Test {
   bool assert(const bool test, const char *caller_name, unsigned int line_no) {
     if (test) {
       success_count++;
-      logger.info(forward<string>("\x1B[92mPASS\x1B[0m "), caller_name, "@", line_no);
+      logger.info(forward<string>("\x1B[92mPASS\x1B[0m "), caller_name, "@",
+                  line_no);
     } else {
       failure_count++;
-      logger.error(forward<string>("\x1B[91mFAIL\x1B[0m "), caller_name, "@", line_no);
+      logger.error(forward<string>("\x1B[91mFAIL\x1B[0m "), caller_name, "@",
+                   line_no);
     }
     return test;
   };

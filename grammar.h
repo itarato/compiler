@@ -5,8 +5,10 @@
 #include <map>
 #include <memory>
 #include <string>
+#include <utility>
 
 #include "grammar_line.h"
+#include "grammar_rule.h"
 
 using namespace std;
 
@@ -18,6 +20,7 @@ struct Grammar {
   bool is_line_def(string);
   bool is_rule_divider(string);
   void save_grammar_line(unique_ptr<GrammarLine>, string);
+  vector<pair<string, GrammarRule>> flatten();
 
   friend ostream &operator<<(ostream &os, const Grammar &self) {
     for (auto const &line : self.lines) {
