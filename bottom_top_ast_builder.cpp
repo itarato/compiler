@@ -44,13 +44,12 @@ AstNode *BottomTopAstBuilder::build() {
   while (!states.empty()) {
     BTState state = states.back();
     states.pop_back();
+    logger.info("State POP");
 
     logger.info("NEW CHECK -", state.token_pos, "-", state.match_pos);
     debug_token_list(tokens, logger);
 
     if (state.substitution.has_value()) {
-      // #TODO Replace back ... -> actually we should rather store the replaced
-      // slice.
       restore_substitute(&tokens, state.match_pos + 1,
                          state.substitution.value());
       logger.info("RESTORE AT", state.match_pos + 1);
@@ -63,7 +62,6 @@ AstNode *BottomTopAstBuilder::build() {
     }
 
     if (tokens.size() == 1) {
-      logger.info("SUCCESS");
       logger.info("SUCCESS");
       return nullptr;
     }
@@ -81,10 +79,9 @@ AstNode *BottomTopAstBuilder::build() {
       logger.info("Has match with rule: ", rules[match.value()].second);
       TokenList erased =
           substitute(&tokens, match_pos, state.token_pos, match.value());
-      // debug_token_list(tokens, logger);
 
-      // states.push_back({state.token_pos + 1, (int)state.token_pos + 1, {}});
       states.push_back({(size_t)match_pos, match_pos - 1, {erased}});
+      states.push_back({(size_t)(match_pos + 1), match_pos + 1, {}});
       states.push_back({(size_t)match_pos, match_pos, {}});
 
       break;
@@ -94,8 +91,6 @@ AstNode *BottomTopAstBuilder::build() {
       states.push_back({state.token_pos + 1, (int)state.token_pos + 1, {}});
       logger.info("NO MATCH -> SHIFT");
     }
-
-    logger.info("State POP");
   }
 
   return nullptr;
@@ -106,8 +101,6 @@ optional<size_t> BottomTopAstBuilder::find_match(TokenList &tokens,
                                                  size_t pos_rhs) {
   size_t len = pos_rhs - pos_lhs + 1;
   for (int i = 0; i < rules.size(); i++) {
-    // logger.info("Try rule", rules[i].second, "on segment", pos_lhs, "..",
-    // pos_rhs);
     if (rules[i].second.parts.size() != len) {
       continue;
     }
