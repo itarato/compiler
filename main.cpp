@@ -11,6 +11,7 @@
 
 #include "ast_builder.h"
 #include "ast_node.h"
+#include "bottom_top_ast_builder.h"
 #include "globals.h"
 #include "grammar.h"
 #include "grammar_normalizer.h"
@@ -18,10 +19,8 @@
 #include "logger.h"
 #include "test.hpp"
 #include "tokenizer.h"
-#include "bottom_top_ast_builder.h"
 
 using namespace std;
-
 
 void sigsegv_handler(int);
 int mode_parse(int, char *[]);
@@ -77,8 +76,7 @@ int mode_parse(int argc, char *argv[]) {
   AstBuilder ab(&g, &t, true);
   unique_ptr<AstNode> p_ast_node(ab.build());
 
-  if (p_ast_node != nullptr)
-    cout << *p_ast_node << endl;
+  if (p_ast_node != nullptr) cout << *p_ast_node << endl;
 
   return EXIT_SUCCESS;
 }
@@ -159,7 +157,8 @@ int mode_test() {
 void print_help() noexcept {
   cout << "Invocation error.\n";
   cout << "Usage for parsing: ./main parse GRAMMAR SOURCE\n";
-  cout << "Usage for LL1-language parsing: ./main llparse GRAMMAR SOURCE";
+  cout << "Usage for LL(N)-language parsing: ./main llparse GRAMMAR SOURCE "
+          "LOOKAHEAD_LIMIT";
   cout << "Usage for bottom to top parsing: ./main btparse GRAMMAR SOURCE";
   cout << "Usage for grammar correction: ./main grammar GRAMMAR\n";
   cout << "Usage for testing: ./main test\n";

@@ -6,6 +6,9 @@ Learning project to:
 - be able to parse grammars
 - tokenizing a source
 - building AST from tokens using the grammar
+  - using regular backtracking parser
+  - LL(N) parser
+  - bottom to top parser
 
 # Grammar reader
 
@@ -62,7 +65,11 @@ cmake . && make && ./compiler test
 
 - Use LL(N) parser:
 
-`./compiler llparse GRAMMAR_FILE SOURCE_FILE LOOKAHEAD_MAXIMUM`
+`./compiler llparse GRAMMAR_FILE SOURCE_FILE LOOKAHEAD_LIMIT`
+
+- Use bottom to top parser:
+
+`./compiler btparse GRAMMAR_FILE SOURCE_FILE`
 
 - Run tests:
 
